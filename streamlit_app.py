@@ -457,47 +457,55 @@ with tab_processing:
             # Fetch available files in processing
             list_coh, pairs_win, pairs = spaccoeff.list_coherence_file()
 
-            # Expandable Settings for Similarity Threshold
-            with st.expander("Pengaturan Parameter Saran Window Otomatis"):
+            # Group grid plots by pair (Outside the form so they can be viewed immediately without re-rendering the form)
+            st.write("Klik expander di bawah ini untuk melihat kurva koherensi masing-masing jendela:")
+            for pair_name, wins in sorted(pairs_win.items()):
+                with st.expander(f"Tampilkan Grid Plot Koherensi - Sesi {pair_name}", expanded=False):
+                    plot_coherence_grid_for_pair(pair_name, wins, os.path.join(working_dir, "processing"))
+
+            st.write("Atur parameter filter dan lakukan seleksi jendela untuk stacking di bawah ini:")
+            with st.form("qc_selection_form"):
+                # Settings for Similarity Threshold
+                st.write("**Parameter Saran Window Otomatis**")
                 std_threshold = st.slider("Tingkat Ketatnya Seleksi (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
                 f_min_check = st.number_input("Rentang Frekuensi Min (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
                 f_max_check = st.number_input("Rentang Frekuensi Max (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
 
-            selected_pairs_win = {}
-            
-            # Group selections and plots by pair
-            for pair_name, wins in sorted(pairs_win.items()):
-                st.markdown(f"#### Analisis & Seleksi: Sesi {pair_name}")
-                
-                # 1. Display grid of all coherence windows for this pair
-                with st.expander(f"Tampilkan Grid Plot Koherensi - Sesi {pair_name}", expanded=False):
-                    plot_coherence_grid_for_pair(pair_name, wins, os.path.join(working_dir, "processing"))
-                
-                # 2. Get similarity suggestions
-                suggested_wins, outlier_wins = suggest_similar_windows(
-                    pair_name, wins, os.path.join(working_dir, "processing"),
-                    std_threshold=std_threshold, f_min_check=f_min_check, f_max_check=f_max_check
-                )
-                
-                # 3. Display suggestions
-                col_sug1, col_sug2 = st.columns(2)
-                with col_sug1:
-                    st.success(f"**Saran Window Konsisten**: {suggested_wins}")
-                with col_sug2:
-                    if outlier_wins:
-                        st.warning(f"**Window Outlier (Tidak Disarankan)**: {outlier_wins}")
-                    else:
-                        st.info("**Window Outlier**: Tidak ada outlier terdeteksi.")
-                
-                # 4. Multiselect widget for this pair, default to suggested_wins
-                selected_wins = st.multiselect(
-                    f"Pilih nomor window untuk di-stacking ({pair_name}):",
-                    options=sorted([int(w) for w in wins]),
-                    default=suggested_wins,
-                    key=f"select_{pair_name}"
-                )
-                selected_pairs_win[pair_name] = selected_wins
                 st.markdown("---")
+                selected_pairs_win = {}
+                
+                # Group selections by pair
+                for pair_name, wins in sorted(pairs_win.items()):
+                    st.markdown(f"#### Analisis & Seleksi: Sesi {pair_name}")
+                    
+                    # 2. Get similarity suggestions
+                    suggested_wins, outlier_wins = suggest_similar_windows(
+                        pair_name, wins, os.path.join(working_dir, "processing"),
+                        std_threshold=std_threshold, f_min_check=f_min_check, f_max_check=f_max_check
+                    )
+                    
+                    # 3. Display suggestions
+                    col_sug1, col_sug2 = st.columns(2)
+                    with col_sug1:
+                        st.success(f"**Saran Window Konsisten**: {suggested_wins}")
+                    with col_sug2:
+                        if outlier_wins:
+                            st.warning(f"**Window Outlier (Tidak Disarankan)**: {outlier_wins}")
+                        else:
+                            st.info("**Window Outlier**: Tidak ada outlier terdeteksi.")
+                    
+                    # 4. Multiselect widget for this pair, default to suggested_wins
+                    selected_wins = st.multiselect(
+                        f"Pilih nomor window untuk di-stacking ({pair_name}):",
+                        options=sorted([int(w) for w in wins]),
+                        default=suggested_wins,
+                        key=f"select_{pair_name}"
+                    )
+                    selected_pairs_win[pair_name] = selected_wins
+                    st.markdown("---")
+                
+                # Submit button
+                submit_qc = st.form_submit_button("Terapkan Seleksi & Hitung Stacking", type="primary")
 
             # --- Two-Stage Stacking ---
             pair_averages = {}
@@ -555,15 +563,16 @@ with tab_processing:
                     marker=dict(size=4)
                 ))
                 
-                # Optional: Plot individual pair averages in light colors for comparison
-                colors_pair = {'Pair_1': 'rgba(255, 75, 75, 0.6)', 'Pair_2': 'rgba(75, 200, 75, 0.6)', 'Pair_3': 'rgba(75, 75, 255, 0.6)'}
-                for pair_name, pair_avg in pair_averages.items():
+                # Optional: Plot individual pair averages in distinct colors for comparison
+                colors_list = ['#FF4B4B', '#3B82F6', '#10B981'] # Red, Blue, Green
+                for idx_pair, (pair_name, pair_avg) in enumerate(sorted(pair_averages.items())):
+                    color = colors_list[idx_pair % len(colors_list)]
                     fig_spac.add_trace(go.Scatter(
                         x=freq,
                         y=pair_avg,
                         mode='lines',
                         name=f'Rata-rata Sesi {pair_name}',
-                        line=dict(color=colors_pair.get(pair_name, 'lightgray'), width=1.5, dash='dash')
+                        line=dict(color=color, width=1.5, dash='dash')
                     ))
                 
                 fig_spac.update_layout(
