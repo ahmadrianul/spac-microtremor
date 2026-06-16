@@ -138,51 +138,15 @@ st.set_page_config(
 # --- Custom Styling ---
 st.markdown("""
     <style>
-    :root {
-        --background-color: #FFFFFF;
-        --text-color: #111827;
-        --sidebar-bg: #F8F9FA;
-        --sidebar-border: #E5E7EB;
-        --tab-bg: #F3F4F6;
-        --tab-text: #4B5563;
-        --tab-selected-bg: #FFFFFF;
-        --tab-selected-border: #D1D5DB;
-        --logo-text-color: #111827;
-        --subtitle-color: #4B5563;
-        --svg-bg: #FAFAFA;
-        --svg-border: #E5E7EB;
-        --svg-text-primary: #111827;
-        --svg-text-secondary: #4B5563;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --background-color: #0E1117;
-            --text-color: #F3F4F6;
-            --sidebar-bg: #1F2937;
-            --sidebar-border: #374151;
-            --tab-bg: #1E293B;
-            --tab-text: #9CA3AF;
-            --tab-selected-bg: #0E1117;
-            --tab-selected-border: #4B5563;
-            --logo-text-color: #FFFFFF;
-            --subtitle-color: #9CA3AF;
-            --svg-bg: #1E293B;
-            --svg-border: #374151;
-            --svg-text-primary: #FFFFFF;
-            --svg-text-secondary: #9CA3AF;
-        }
-    }
-
-    /* Apply Dynamic Theme globally */
+    /* Force Light Background globally */
     .stApp {
-        background-color: var(--background-color) !important;
-        color: var(--text-color) !important;
+        background-color: #FFFFFF !important;
+        color: #111827 !important;
     }
     /* Style the Sidebar */
     [data-testid="stSidebar"] {
-        background-color: var(--sidebar-bg) !important;
-        border-right: 2px solid var(--sidebar-border) !important;
+        background-color: #F8F9FA !important;
+        border-right: 2px solid #E5E7EB !important;
     }
     .main-title {
         font-size: 2.5rem;
@@ -192,50 +156,28 @@ st.markdown("""
     }
     .subtitle {
         font-size: 1.1rem;
-        color: var(--subtitle-color);
+        color: #4B5563;
         margin-bottom: 2rem;
     }
     /* Tab Styling with clear boundaries */
     div[data-baseweb="tab-list"] {
-        border-bottom: 2px solid var(--sidebar-border) !important;
+        border-bottom: 2px solid #E5E7EB !important;
         gap: 6px;
     }
     button[role="tab"] {
-        border: 2px solid var(--sidebar-border) !important;
+        border: 2px solid #E5E7EB !important;
         border-bottom: none !important;
         border-radius: 6px 6px 0 0 !important;
-        background-color: var(--tab-bg) !important;
-        color: var(--tab-text) !important;
+        background-color: #F3F4F6 !important;
+        color: #4B5563 !important;
         font-weight: bold !important;
         padding: 8px 16px !important;
     }
     button[role="tab"][aria-selected="true"] {
-        background-color: var(--tab-selected-bg) !important;
+        background-color: #FFFFFF !important;
         color: #FF4B4B !important;
-        border: 2px solid var(--tab-selected-border) !important;
-        border-bottom: 3px solid var(--tab-selected-bg) !important;
-    }
-    .logo-text {
-        color: var(--logo-text-color) !important;
-    }
-    .svg-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        background-color: var(--svg-bg);
-        padding: 1.5rem;
-        border: 2px solid var(--svg-border);
-        border-radius: 8px;
-    }
-    .svg-text-primary {
-        fill: var(--svg-text-primary) !important;
-    }
-    .svg-text-secondary {
-        fill: var(--svg-text-secondary) !important;
-    }
-    .svg-circle-primary {
-        stroke: var(--svg-text-primary) !important;
+        border: 2px solid #D1D5DB !important;
+        border-bottom: 3px solid #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -244,7 +186,7 @@ st.markdown("""
 st.markdown("""
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; margin-bottom: 1.5rem; text-align: center;">
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
-            <span class="logo-text" style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; letter-spacing: -1.5px; line-height: 1;">SP</span>
+            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; letter-spacing: -1.5px; line-height: 1;">SP</span>
             <svg width="50" height="50" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="margin-left: 4px; margin-right: 4px; margin-bottom: 4px;">
                 <!-- Triangle Lines representing letter A -->
                 <line x1="6" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
@@ -260,7 +202,7 @@ st.markdown("""
                 <!-- Center Node -->
                 <circle cx="22" cy="26.7" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
             </svg>
-            <span class="logo-text" style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; letter-spacing: -1.5px; line-height: 1;">C</span>
+            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; letter-spacing: -1.5px; line-height: 1;">C</span>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -452,7 +394,7 @@ with tab_teori:
         
         # Render larger SVG array geometry illustration
         st.markdown("""
-            <div class="svg-container">
+            <div style="display: flex; justify-content: center; margin-top: 1rem; margin-bottom: 1rem; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
                 <svg width="220" height="190" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
                     <!-- Triangle Lines -->
                     <line x1="100" y1="15" x2="35" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
@@ -463,19 +405,19 @@ with tab_teori:
                     <line x1="100" y1="90" x2="35" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
                     <line x1="100" y1="90" x2="165" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
                     <!-- Center Node A -->
-                    <circle cx="100" cy="90" r="9" fill="var(--background-color)" class="svg-circle-primary" stroke-width="3" />
-                    <text x="100" y="93.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" class="svg-text-primary">A</text>
+                    <circle cx="100" cy="90" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
+                    <text x="100" y="93.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
                     <!-- Top Vertex B1 -->
-                    <circle cx="100" cy="15" r="9" fill="var(--background-color)" stroke="#FF4B4B" stroke-width="3" />
+                    <circle cx="100" cy="15" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
                     <text x="100" y="18.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
                     <!-- Bottom-Left Vertex B3 -->
-                    <circle cx="35" cy="128" r="9" fill="var(--background-color)" stroke="#FF4B4B" stroke-width="3" />
+                    <circle cx="35" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
                     <text x="35" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
                     <!-- Bottom-Right Vertex B2 -->
-                    <circle cx="165" cy="128" r="9" fill="var(--background-color)" stroke="#FF4B4B" stroke-width="3" />
+                    <circle cx="165" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
                     <text x="165" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
                     <!-- Radius Text -->
-                    <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" class="svg-text-secondary">Radius (r)</text>
+                    <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
                 </svg>
             </div>
         """, unsafe_allow_html=True)
