@@ -458,7 +458,7 @@ with tab_processing:
             list_coh, pairs_win, pairs = spaccoeff.list_coherence_file()
 
             # Expandable Settings for Similarity Threshold
-            with st.expander("⚙️ Pengaturan Parameter Saran Window Otomatis"):
+            with st.expander("Pengaturan Parameter Saran Window Otomatis"):
                 std_threshold = st.slider("Tingkat Ketatnya Seleksi (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
                 f_min_check = st.number_input("Rentang Frekuensi Min (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
                 f_max_check = st.number_input("Rentang Frekuensi Max (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
@@ -467,10 +467,10 @@ with tab_processing:
             
             # Group selections and plots by pair
             for pair_name, wins in sorted(pairs_win.items()):
-                st.markdown(f"#### 📊 Analisis & Seleksi: Sesi {pair_name}")
+                st.markdown(f"#### Analisis & Seleksi: Sesi {pair_name}")
                 
                 # 1. Display grid of all coherence windows for this pair
-                with st.expander(f"👁️ Tampilkan Grid Plot Koherensi - Sesi {pair_name}", expanded=False):
+                with st.expander(f"Tampilkan Grid Plot Koherensi - Sesi {pair_name}", expanded=False):
                     plot_coherence_grid_for_pair(pair_name, wins, os.path.join(working_dir, "processing"))
                 
                 # 2. Get similarity suggestions
@@ -482,12 +482,12 @@ with tab_processing:
                 # 3. Display suggestions
                 col_sug1, col_sug2 = st.columns(2)
                 with col_sug1:
-                    st.success(f"✅ **Saran Window Konsisten**: {suggested_wins}")
+                    st.success(f"**Saran Window Konsisten**: {suggested_wins}")
                 with col_sug2:
                     if outlier_wins:
-                        st.warning(f"⚠️ **Window Outlier (Tidak Disarankan)**: {outlier_wins}")
+                        st.warning(f"**Window Outlier (Tidak Disarankan)**: {outlier_wins}")
                     else:
-                        st.info("ℹ️ **Window Outlier**: Tidak ada outlier terdeteksi.")
+                        st.info("**Window Outlier**: Tidak ada outlier terdeteksi.")
                 
                 # 4. Multiselect widget for this pair, default to suggested_wins
                 selected_wins = st.multiselect(
