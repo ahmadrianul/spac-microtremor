@@ -15,7 +15,7 @@ from spacunhas import environment, readdata, windowing, complexcoherence, spacco
 # --- Page Configuration ---
 st.set_page_config(
     page_title="SPAC Dispersion Extractor",
-    page_icon="🌋",
+    page_icon=None,
     layout="wide"
 )
 
@@ -76,7 +76,30 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title Area
-st.markdown('<div class="main-title">🌋 SPAC Microtremor Dispersion Extractor</div>', unsafe_allow_html=True)
+st.markdown("""
+    <div style="display: flex; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
+        <svg width="220" height="60" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 10px;">
+            <!-- Letters S and P -->
+            <text x="5" y="48" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="48" font-weight="900" fill="#111827">SP</text>
+            <!-- Triangle Lines representing letter A -->
+            <line x1="90" y1="46" x2="110" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+            <line x1="130" y1="46" x2="110" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+            <line x1="90" y1="46" x2="130" y2="46" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+            <!-- Vertices & Center Donuts -->
+            <!-- Top Vertex -->
+            <circle cx="110" cy="12" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <!-- Bottom-Left Vertex -->
+            <circle cx="90" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <!-- Bottom-Right Vertex -->
+            <circle cx="130" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <!-- Center Node -->
+            <circle cx="110" cy="34.7" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <!-- Letter C -->
+            <text x="145" y="48" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="48" font-weight="900" fill="#111827">C</text>
+        </svg>
+        <span style="font-size: 2.0rem; font-weight: 800; color: #111827; font-family: 'Inter', 'Outfit', sans-serif; letter-spacing: -0.5px; line-height: 60px;">Microtremor Dispersion Extractor</span>
+    </div>
+""", unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
 
 # --- Session State Initialization ---
@@ -90,7 +113,7 @@ if "main_folder_path" not in st.session_state:
     st.session_state.main_folder_path = "./workspace"
 
 # --- Sidebar Parameter Inputs ---
-st.sidebar.header("⚙️ Parameter Pemrosesan")
+st.sidebar.header("Parameter Pemrosesan")
 
 working_dir = st.sidebar.text_input("Folder Direktori Kerja", value=st.session_state.main_folder_path)
 st.session_state.main_folder_path = working_dir
@@ -120,7 +143,7 @@ except Exception as e:
     st.stop()
 
 # --- Main Layout Tabs ---
-tab_input, tab_processing, tab_output = st.tabs(["📂 Input Data & Sesi", "🔄 Pemrosesan & Quality Control", "📊 Kurva Dispersi Final"])
+tab_input, tab_processing, tab_output = st.tabs(["Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi Final"])
 
 # ==========================================
 # TAB 1: INPUT DATA
@@ -133,21 +156,21 @@ with tab_input:
     
     with col_s1:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown("### 🔹 Sesi 1 (A - B1)")
+        st.markdown("### Sesi 1 (A - B1)")
         file_a1 = st.file_uploader("Upload Pusat A Sesi 1", type=["sac", "mseed"], key="file_a1")
         file_b1 = st.file_uploader("Upload Keliling B1 Sesi 1", type=["sac", "mseed"], key="file_b1")
         st.markdown('</div>', unsafe_allow_html=True)
         
     with col_s2:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown("### 🔹 Sesi 2 (A - B2)")
+        st.markdown("### Sesi 2 (A - B2)")
         file_a2 = st.file_uploader("Upload Pusat A Sesi 2", type=["sac", "mseed"], key="file_a2")
         file_b2 = st.file_uploader("Upload Keliling B2 Sesi 2", type=["sac", "mseed"], key="file_b2")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col_s3:
         st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown("### 🔹 Sesi 3 (A - B3)")
+        st.markdown("### Sesi 3 (A - B3)")
         file_a3 = st.file_uploader("Upload Pusat A Sesi 3", type=["sac", "mseed"], key="file_a3")
         file_b3 = st.file_uploader("Upload Keliling B3 Sesi 3", type=["sac", "mseed"], key="file_b3")
         st.markdown('</div>', unsafe_allow_html=True)
@@ -155,7 +178,7 @@ with tab_input:
     st.markdown("---")
     
     # Demo Data Option
-    st.write("💡 **Belum punya data lapangan?** Gunakan data demo mikrotremor kami untuk mencoba:")
+    st.write("**Belum punya data lapangan?** Gunakan data demo mikrotremor kami untuk mencoba:")
     demo_btn = st.button("Gunakan Data Demo (Site Hasanuddin University)")
     
     if demo_btn:
@@ -211,7 +234,7 @@ with tab_input:
 
     # Display status
     if len(st.session_state.data_list_by_pair) > 0:
-        st.info(f"📂 File siap untuk diproses: " + ", ".join([f"{k}: {v}" for k, v in st.session_state.data_list_by_pair.items()]))
+        st.info(f"File siap untuk diproses: " + ", ".join([f"{k}: {v}" for k, v in st.session_state.data_list_by_pair.items()]))
     else:
         st.warning("Silakan unggah set data seismik minimal 1 sesi atau gunakan Data Demo.")
 
@@ -225,7 +248,7 @@ with tab_processing:
         st.warning("Silakan unggah data Anda atau muat Data Demo di tab pertama sebelum memproses.")
     else:
         # Run process button
-        btn_run = st.button("🚀 Mulai Proses Windowing & Koherensi", type="primary")
+        btn_run = st.button("Mulai Proses Windowing & Koherensi", type="primary")
         
         if btn_run or st.session_state.coherence_calculated:
             with st.spinner("Sedang memproses sinyal, membagi jendela, dan menghitung koherensi..."):
@@ -246,14 +269,14 @@ with tab_processing:
 
                     # Loop through each pair
                     for pair_key, files in st.session_state.data_list_by_pair.items():
-                        st.markdown(f"#### 🔍 Memproses Sesi {pair_key} ({files[0]} - {files[1]})")
+                        st.markdown(f"#### Memproses Sesi {pair_key} ({files[0]} - {files[1]})")
                         
                         # Read data
                         data_init = readdata.ReadData(main_folder, files, 'SAC')
                         datas = data_init.read_data()
                         
                         # Show windowed data plots side-by-side
-                        st.markdown(f"##### 📊 Visualisasi Windowed Data - Sesi {pair_key}")
+                        st.markdown(f"##### Visualisasi Windowed Data - Sesi {pair_key}")
                         col_w1, col_w2 = st.columns(2)
                         
                         # Windowing for each file
@@ -302,7 +325,7 @@ with tab_processing:
         # --- Quality Control Section (Dynamic UI) ---
         if st.session_state.coherence_calculated:
             st.markdown("---")
-            st.markdown("### 🛠️ Quality Control: Seleksi Jendela Koherensi")
+            st.markdown("### Quality Control: Seleksi Jendela Koherensi")
             st.write("Peta koherensi per jendela waktu telah dihitung. Pilih jendela waktu yang bersih (bebas dari transisi noise atau spike) untuk dirata-ratakan (stacking):")
 
             # Determine maximum windows among the computed pairs
@@ -348,7 +371,7 @@ with tab_processing:
                 st.session_state.avspac_stacked = avspac
                 
                 # --- Visualizations ---
-                st.markdown("#### 📈 Hasil Stacking SPAC Coefficient")
+                st.markdown("#### Hasil Stacking SPAC Coefficient")
                 
                 # Plotly Plot for observed SPAC coefficient
                 fig_spac = go.Figure()
@@ -424,7 +447,7 @@ with tab_output:
     if "spaccoeff_obj" not in st.session_state:
         st.warning("Silakan selesaikan pemrosesan dan Quality Control di tab kedua terlebih dahulu.")
     else:
-        st.info(f"📊 Menghitung kurva dispersi dengan batas kecepatan fase: {min_pv} m/s hingga {max_pv} m/s.")
+        st.info(f"Menghitung kurva dispersi dengan batas kecepatan fase: {min_pv} m/s hingga {max_pv} m/s.")
         
         # Inisialisasi Objek DispersionCurve
         dc = dispersioncurve.DispersionCurve(st.session_state.spaccoeff_obj)
@@ -440,7 +463,7 @@ with tab_output:
                 pv, f_pv, bessel_fit, x_bessel, fitted_avspac = dc.calculate_dispcurv(min_pv, max_pv)
                 
                 # --- Frequency Cut Feature ---
-                st.markdown("### ✂️ Pemotongan Rentang Frekuensi Kurva Dispersi")
+                st.markdown("### Pemotongan Rentang Frekuensi Kurva Dispersi")
                 st.write("Sesuaikan rentang frekuensi yang ingin Anda gunakan untuk analisis lebih lanjut:")
                 col_cut1, col_cut2 = st.columns(2)
                 with col_cut1:
@@ -462,7 +485,7 @@ with tab_output:
                 col_c1, col_c2 = st.columns(2)
                 
                 with col_c1:
-                    st.markdown("#### 🎯 Fitting Fungsi Bessel J0")
+                    st.markdown("#### Fitting Fungsi Bessel J0")
                     
                     fig_bessel = go.Figure()
                     
@@ -530,7 +553,7 @@ with tab_output:
                     st.plotly_chart(fig_bessel, use_container_width=True)
                     
                 with col_c2:
-                    st.markdown("#### 📈 Kurva Dispersi Rayleigh")
+                    st.markdown("#### Kurva Dispersi Rayleigh")
                     
                     fig_disp = go.Figure()
                     
@@ -590,7 +613,7 @@ with tab_output:
                     
                 # --- Export and Download Results ---
                 st.markdown("---")
-                st.markdown("### 📥 Ekspor Hasil Analisis")
+                st.markdown("### Ekspor Hasil Analisis")
                 
                 # Full Dataframe
                 export_df_full = pd.DataFrame({
@@ -618,7 +641,7 @@ with tab_output:
                 with col_btn1:
                     csv_full = export_df_full.to_csv(index=False)
                     st.download_button(
-                        label="💾 Unduh Kurva Dispersi Penuh (CSV)",
+                        label="Unduh Kurva Dispersi Penuh (CSV)",
                         data=csv_full,
                         file_name=f"dispersion_curve_FULL_radius_{radius}m.csv",
                         mime="text/csv",
@@ -627,7 +650,7 @@ with tab_output:
                 with col_btn2:
                     csv_cut = export_df_cut.to_csv(index=False)
                     st.download_button(
-                        label="✂️ Unduh Kurva Dispersi Terpotong (CSV)",
+                        label="Unduh Kurva Dispersi Terpotong (CSV)",
                         data=csv_cut,
                         file_name=f"dispersion_curve_CUT_{cut_f_min:.1f}to{cut_f_max:.1f}Hz.csv",
                         mime="text/csv",
