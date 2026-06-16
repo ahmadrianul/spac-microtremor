@@ -15,7 +15,7 @@ from spacunhas import environment, readdata, windowing, complexcoherence, spacco
 # --- Page Configuration ---
 st.set_page_config(
     page_title="SPAC Dispersion Extractor",
-    page_icon=None,
+    page_icon="favicon.png",
     layout="wide"
 )
 
@@ -77,30 +77,29 @@ st.markdown("""
 
 # Title Area
 st.markdown("""
-    <div style="display: flex; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
-        <svg width="220" height="60" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 10px;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; margin-bottom: 1.5rem; text-align: center;">
+        <svg width="240" height="88" viewBox="0 0 165 60" xmlns="http://www.w3.org/2000/svg">
             <!-- Letters S and P -->
             <text x="5" y="48" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="48" font-weight="900" fill="#111827">SP</text>
             <!-- Triangle Lines representing letter A -->
-            <line x1="90" y1="46" x2="110" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
-            <line x1="130" y1="46" x2="110" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
-            <line x1="90" y1="46" x2="130" y2="46" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+            <line x1="72" y1="46" x2="92" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+            <line x1="112" y1="46" x2="92" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+            <line x1="72" y1="46" x2="112" y2="46" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
             <!-- Vertices & Center Donuts -->
             <!-- Top Vertex -->
-            <circle cx="110" cy="12" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <circle cx="92" cy="12" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
             <!-- Bottom-Left Vertex -->
-            <circle cx="90" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <circle cx="72" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
             <!-- Bottom-Right Vertex -->
-            <circle cx="130" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <circle cx="112" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
             <!-- Center Node -->
-            <circle cx="110" cy="34.7" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+            <circle cx="92" cy="34.7" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
             <!-- Letter C -->
-            <text x="145" y="48" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="48" font-weight="900" fill="#111827">C</text>
+            <text x="124" y="48" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="48" font-weight="900" fill="#111827">C</text>
         </svg>
-        <span style="font-size: 2.0rem; font-weight: 800; color: #111827; font-family: 'Inter', 'Outfit', sans-serif; letter-spacing: -0.5px; line-height: 60px;">Microtremor Dispersion Extractor</span>
     </div>
 """, unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
 
 # --- Session State Initialization ---
 if "step" not in st.session_state:
@@ -182,8 +181,8 @@ with tab_input:
     demo_btn = st.button("Gunakan Data Demo (Site Hasanuddin University)")
     
     if demo_btn:
-        # We will copy demo data from local C:\Users\RIANO\spac-unhas-main\spac-unhas-main\examples\data2\data
-        demo_src_dir = r"C:\Users\RIANO\spac-unhas-main\spac-unhas-main\examples\data2\data"
+        # We will copy demo data from local demo_data folder in the repo
+        demo_src_dir = "./demo_data"
         if os.path.exists(demo_src_dir):
             try:
                 for demo_file in ["A11.sac", "B11.sac", "A12.sac", "B12.sac", "A13.sac", "B13.sac"]:
@@ -200,7 +199,7 @@ with tab_input:
             except Exception as ex:
                 st.error(f"Gagal menyalin data demo: {ex}")
         else:
-            st.warning("Folder data demo lokal tidak ditemukan. Silakan unggah file Anda secara manual.")
+            st.warning("Folder data demo tidak ditemukan. Silakan unggah file Anda secara manual.")
 
     # Save Uploaded Files
     if not demo_btn:
