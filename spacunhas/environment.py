@@ -8,7 +8,7 @@ try:
     import pandas
     import matplotlib.pyplot as plt
     import matplotlib.colors as mcolors
-    from matplotlib.cm import get_cmap
+    from matplotlib.pyplot import get_cmap
     from scipy import signal
     from scipy.fft import fft, fftfreq  # Removed duplicate fft/fftfreq import
     from matplotlib.ticker import LogLocator, FixedLocator, MultipleLocator, LogFormatter

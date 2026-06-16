@@ -5,7 +5,7 @@ from scipy import signal
 from scipy.fft import fft, fftfreq
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from matplotlib.cm import get_cmap
+from matplotlib.pyplot import get_cmap
 from matplotlib.ticker import LogLocator, FixedLocator, MultipleLocator, LogFormatter
 
 class ComplexCoherence:

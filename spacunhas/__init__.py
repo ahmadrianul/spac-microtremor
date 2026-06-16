@@ -6,7 +6,7 @@ from obspy import read
 import pandas
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from matplotlib.cm import get_cmap
+from matplotlib.pyplot import get_cmap
 from matplotlib.ticker import LogLocator, FixedLocator, MultipleLocator, LogFormatter
 import scipy
 from scipy import signal

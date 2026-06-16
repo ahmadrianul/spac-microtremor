@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from matplotlib.cm import get_cmap
+from matplotlib.pyplot import get_cmap
 from matplotlib.ticker import LogLocator, FixedLocator, MultipleLocator, LogFormatter
 
 class SPACCoefficient:
