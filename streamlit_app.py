@@ -854,19 +854,8 @@ with tab_output:
                 # returns: pv, f_pv, bessel_fit, x_bessel, fitted_avspac
                 pv, f_pv, bessel_fit, x_bessel, fitted_avspac = dc.calculate_dispcurv(min_pv, max_pv)
                 
-                # Hitung rekomendasi rentang frekuensi ideal (kr: 0.3 s.d. 3.8)
-                ideal_mask = (x_bessel >= 0.3) & (x_bessel <= 3.8)
-                if np.any(ideal_mask):
-                    rec_freqs = f_pv[ideal_mask]
-                    f_rec_min = float(np.round(np.min(rec_freqs), 2))
-                    f_rec_max = float(np.round(np.max(rec_freqs), 2))
-                else:
-                    f_rec_min = float(np.round(np.min(f_pv), 2))
-                    f_rec_max = float(np.round(np.max(f_pv), 2))
-                
                 # --- Frequency Cut Feature ---
                 st.markdown("### Pemotongan Rentang Frekuensi Kurva Dispersi")
-                st.info(f"💡 **Saran Rentang Frekuensi Ideal:** `{f_rec_min} Hz` s.d. `{f_rec_max} Hz` (dihitung secara teoritis berdasarkan rentang argumen Bessel $kr$ ideal antara $0.3$ dan $3.8$ untuk menghindari keterbatasan resolusi dan aliasing spasial).")
                 st.write("Sesuaikan rentang frekuensi yang ingin Anda gunakan untuk analisis lebih lanjut:")
                 col_cut1, col_cut2 = st.columns(2)
                 with col_cut1:
@@ -958,6 +947,17 @@ with tab_output:
                 with col_c2:
                     st.markdown("#### Kurva Dispersi Rayleigh")
                     
+                    # Tentukan batas zoom otomatis secara dinamis
+                    if len(f_pv_cut) > 0:
+                        y_min = float(np.min(pv_cut))
+                        y_max = float(np.max(pv_cut))
+                        y_pad = (y_max - y_min) * 0.05 if y_max > y_min else 50.0
+                        y_range = [y_min - y_pad, y_max + y_pad]
+                        x_range = [float(cut_f_min), float(cut_f_max)]
+                    else:
+                        x_range = [0.0, 50.0]
+                        y_range = [float(min_pv), float(max_pv)]
+                        
                     fig_disp = go.Figure()
                     
                     # Full Curve (Gray)
@@ -987,7 +987,7 @@ with tab_output:
                          ),
                          xaxis=dict(
                              title=dict(text="Frekuensi (Hz)", font=dict(color="black")),
-                             range=[0, 50],
+                             range=x_range,
                              showgrid=True,
                              gridcolor="lightgray",
                              linecolor="black",
@@ -997,7 +997,7 @@ with tab_output:
                          ),
                          yaxis=dict(
                              title=dict(text="Kecepatan Fase (m/s)", font=dict(color="black")),
-                             range=[min_pv, max_pv],
+                             range=y_range,
                              showgrid=True,
                              gridcolor="lightgray",
                              linecolor="black",
