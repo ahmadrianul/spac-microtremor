@@ -471,7 +471,7 @@ with tab_output:
                     mime="text/csv"
                 )
                 
-                st.balloons()
+
                 
             except Exception as ex_fit:
                 st.error(f"Gagal melakukan least-squares fitting: {ex_fit}")
