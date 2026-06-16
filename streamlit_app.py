@@ -380,35 +380,35 @@ with tab_processing:
                     pass
                 
                 fig_spac.update_layout(
-                     title="Koefisien SPAC Rata-rata vs Frekuensi",
-                     xaxis_title="Frekuensi (Hz)",
-                     yaxis_title="Koefisien SPAC",
-                     xaxis_range=[0, 50],
-                     yaxis_range=[-1.1, 1.1],
+                     title=dict(
+                         text="Koefisien SPAC Rata-rata vs Frekuensi",
+                         font=dict(color="black")
+                     ),
+                     xaxis=dict(
+                         title=dict(text="Frekuensi (Hz)", font=dict(color="black")),
+                         range=[0, 50],
+                         showgrid=True,
+                         gridcolor="lightgray",
+                         linecolor="black",
+                         ticks="outside",
+                         tickcolor="black",
+                         tickfont=dict(color="black")
+                     ),
+                     yaxis=dict(
+                         title=dict(text="Koefisien SPAC", font=dict(color="black")),
+                         range=[-1.1, 1.1],
+                         showgrid=True,
+                         gridcolor="lightgray",
+                         linecolor="black",
+                         ticks="outside",
+                         tickcolor="black",
+                         tickfont=dict(color="black")
+                     ),
                      template="plotly_white",
                      height=500,
                      plot_bgcolor="white",
-                     paper_bgcolor="white",
-                     xaxis=dict(
-                         showgrid=True,
-                         gridcolor="lightgray",
-                         linecolor="black",
-                         ticks="outside",
-                         tickcolor="black",
-                         tickfont=dict(color="black"),
-                         titlefont=dict(color="black")
-                     ),
-                     yaxis=dict(
-                         showgrid=True,
-                         gridcolor="lightgray",
-                         linecolor="black",
-                         ticks="outside",
-                         tickcolor="black",
-                         tickfont=dict(color="black"),
-                         titlefont=dict(color="black")
-                     ),
-                     title_font=dict(color="black")
-                 )
+                     paper_bgcolor="white"
+                )
                 fig_spac.add_hline(y=0, line_dash="dash", line_color="red", line_width=1)
                 
                 st.plotly_chart(fig_spac, use_container_width=True)
@@ -496,34 +496,34 @@ with tab_output:
                     ))
                     
                     fig_bessel.update_layout(
-                        title="Pencocokan Data Lapangan ke Fungsi Bessel J0",
-                        xaxis_title="Bessel Argument (2*pi*f*r / c)",
-                        yaxis_title="Koefisien SPAC",
-                        xaxis_range=[0, 10],
-                        yaxis_range=[-1.1, 1.1],
+                        title=dict(
+                            text="Pencocokan Data Lapangan ke Fungsi Bessel J0",
+                            font=dict(color="black")
+                        ),
+                        xaxis=dict(
+                            title=dict(text="Bessel Argument (2*pi*f*r / c)", font=dict(color="black")),
+                            range=[0, 10],
+                            showgrid=True,
+                            gridcolor="lightgray",
+                            linecolor="black",
+                            ticks="outside",
+                            tickcolor="black",
+                            tickfont=dict(color="black")
+                        ),
+                        yaxis=dict(
+                            title=dict(text="Koefisien SPAC", font=dict(color="black")),
+                            range=[-1.1, 1.1],
+                            showgrid=True,
+                            gridcolor="lightgray",
+                            linecolor="black",
+                            ticks="outside",
+                            tickcolor="black",
+                            tickfont=dict(color="black")
+                        ),
                         template="plotly_white",
                         height=450,
                         plot_bgcolor="white",
                         paper_bgcolor="white",
-                        xaxis=dict(
-                            showgrid=True,
-                            gridcolor="lightgray",
-                            linecolor="black",
-                            ticks="outside",
-                            tickcolor="black",
-                            tickfont=dict(color="black"),
-                            titlefont=dict(color="black")
-                        ),
-                        yaxis=dict(
-                            showgrid=True,
-                            gridcolor="lightgray",
-                            linecolor="black",
-                            ticks="outside",
-                            tickcolor="black",
-                            tickfont=dict(color="black"),
-                            titlefont=dict(color="black")
-                        ),
-                        title_font=dict(color="black"),
                         legend=dict(font=dict(color="black"))
                     )
                     fig_bessel.add_hline(y=0, line_dash="dash", line_color="gray")
@@ -555,36 +555,36 @@ with tab_output:
                     ))
                     
                     fig_disp.update_layout(
-                        title="Kurva Dispersi Rayleigh (Kecepatan Fase vs Frekuensi)",
-                        xaxis_title="Frekuensi (Hz)",
-                        yaxis_title="Kecepatan Fase (m/s)",
-                        xaxis_range=[0, 50],
-                        yaxis_range=[min_pv, max_pv],
-                        template="plotly_white",
-                        height=450,
-                        plot_bgcolor="white",
-                        paper_bgcolor="white",
-                        xaxis=dict(
-                            showgrid=True,
-                            gridcolor="lightgray",
-                            linecolor="black",
-                            ticks="outside",
-                            tickcolor="black",
-                            tickfont=dict(color="black"),
-                            titlefont=dict(color="black")
-                        ),
-                        yaxis=dict(
-                            showgrid=True,
-                            gridcolor="lightgray",
-                            linecolor="black",
-                            ticks="outside",
-                            tickcolor="black",
-                            tickfont=dict(color="black"),
-                            titlefont=dict(color="black")
-                        ),
-                        title_font=dict(color="black"),
-                        legend=dict(font=dict(color="black"))
-                    )
+                         title=dict(
+                             text="Kurva Dispersi Rayleigh (Kecepatan Fase vs Frekuensi)",
+                             font=dict(color="black")
+                         ),
+                         xaxis=dict(
+                             title=dict(text="Frekuensi (Hz)", font=dict(color="black")),
+                             range=[0, 50],
+                             showgrid=True,
+                             gridcolor="lightgray",
+                             linecolor="black",
+                             ticks="outside",
+                             tickcolor="black",
+                             tickfont=dict(color="black")
+                         ),
+                         yaxis=dict(
+                             title=dict(text="Kecepatan Fase (m/s)", font=dict(color="black")),
+                             range=[min_pv, max_pv],
+                             showgrid=True,
+                             gridcolor="lightgray",
+                             linecolor="black",
+                             ticks="outside",
+                             tickcolor="black",
+                             tickfont=dict(color="black")
+                         ),
+                         template="plotly_white",
+                         height=450,
+                         plot_bgcolor="white",
+                         paper_bgcolor="white",
+                         legend=dict(font=dict(color="black"))
+                     )
                     fig_disp.update_yaxes(type="linear")
                     st.plotly_chart(fig_disp, use_container_width=True)
                     
