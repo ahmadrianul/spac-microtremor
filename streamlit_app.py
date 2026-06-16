@@ -22,6 +22,16 @@ st.set_page_config(
 # --- Custom Styling ---
 st.markdown("""
     <style>
+    /* Force Light Background globally */
+    .stApp {
+        background-color: #FFFFFF !important;
+        color: #111827 !important;
+    }
+    /* Style the Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #F8F9FA !important;
+        border-right: 2px solid #E5E7EB !important;
+    }
     .main-title {
         font-size: 2.5rem;
         color: #FF4B4B;
@@ -30,16 +40,37 @@ st.markdown("""
     }
     .subtitle {
         font-size: 1.1rem;
-        color: #6D7A96;
+        color: #4B5563;
         margin-bottom: 2rem;
     }
+    /* Define distinct card borders and backgrounds */
     .metric-card {
-        background-color: #F8F9FA;
-        padding: 1.2rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border: 1px solid #E9ECEF;
+        background-color: #FAFAFA;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        border: 2px solid #D1D5DB;
         margin-bottom: 1rem;
+    }
+    /* Tab Styling with clear boundaries */
+    div[data-baseweb="tab-list"] {
+        border-bottom: 2px solid #E5E7EB !important;
+        gap: 6px;
+    }
+    button[role="tab"] {
+        border: 2px solid #E5E7EB !important;
+        border-bottom: none !important;
+        border-radius: 6px 6px 0 0 !important;
+        background-color: #F3F4F6 !important;
+        color: #4B5563 !important;
+        font-weight: bold !important;
+        padding: 8px 16px !important;
+    }
+    button[role="tab"][aria-selected="true"] {
+        background-color: #FFFFFF !important;
+        color: #FF4B4B !important;
+        border: 2px solid #D1D5DB !important;
+        border-bottom: 3px solid #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
