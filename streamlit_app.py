@@ -268,7 +268,7 @@ tab_teori, tab_input, tab_processing, tab_output = st.tabs(["Teori & Panduan", "
 # ==========================================
 with tab_teori:
     st.markdown("### Modul Teori & Panduan Metode SPAC Sekuensial")
-    st.write("Silakan pilih topik penjelasan ilmiah di bawah ini untuk mempelajari lebih lanjut tentang metode SPAC, formulasi matematis, desain akuisisi, alur pengolahan, jurnal pendukung, dan contoh studi kasus skripsi:")
+    st.write("Silakan pilih topik penjelasan ilmiah di bawah ini untuk mempelajari lebih lanjut tentang metode SPAC, formulasi matematis, desain akuisisi, alur pengolahan, dan jurnal pendukung:")
     
     topik = st.selectbox(
         "Pilih Topik Penjelasan:",
@@ -277,8 +277,7 @@ with tab_teori:
             "2. Formulasi Matematis & Rumus",
             "3. Desain Akuisisi Data Sekuensial (Two-Station)",
             "4. Alur Pengolahan Data (Step-by-Step)",
-            "5. Dukungan Artikel & Jurnal Ilmiah",
-            "6. Studi Kasus Skripsi (Desa Lonjoboko)"
+            "5. Dukungan Artikel & Jurnal Ilmiah"
         ],
         key="topik_teori"
     )
@@ -474,66 +473,13 @@ with tab_teori:
         st.markdown(r"""
             #### 5. Dukungan Artikel & Jurnal Ilmiah
             
-            Untuk memperkuat validasi akademis dan memberikan referensi bagi pengguna, berikut adalah daftar pustaka dan ringkasan makalah ilmiah utama yang melandasi metode SPAC sekuensial:
+            Berikut adalah daftar pustaka artikel ilmiah utama yang melandasi metode SPAC sekuensial, disusun secara alfabetis sesuai format **APA (American Psychological Association)**:
             
-            1.  **Aki, K. (1957).** *Space and time spectra of stationary stochastic waves, with special reference to microtremors.* Bulletin of the Earthquake Research Institute, 35, 415–456.
-                *   **Kontribusi:** Makalah fundamental yang pertama kali merumuskan dasar teori korelasi spasial (SPAC) untuk menganalisis medan gelombang stokastik stasioner dari mikrotremor.
-            2.  **Okada, H. (2003).** *The Microtremor Survey Method.* Society of Exploration Geophysicists (Translated by K. Suto).
-                *   **Kontribusi:** Buku referensi utama yang memaparkan teori, akuisisi, dan pemrosesan data mikrotremor (SPAC dan ESPAC) untuk rekayasa geoteknik dan seismologi teknik.
-            3.  **Cho, I. (2020).** *Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components.* Geophysical Journal International, 220, 1735–1747.
-                *   **Kontribusi:** Meneliti formulasi teoritis metode SPAC menggunakan hanya dua sensor (two-sensor SPAC) dan menganalisis peran komponen spektrum imajiner untuk mendeteksi ketidakstabilan arah datang gelombang.
-            4.  **Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022).** *Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data.* Journal of Seismology, 26, 601–627.
-                *   **Kontribusi:** Panduan komprehensif dari komite internasional mengenai praktik terbaik (*good practices*) untuk akuisisi lapangan dan pengolahan data menggunakan analisis SPAC.
-            5.  **Chimoto, K., Onishi, K., & Matsuoka, T. (2023).** *Simple SPAC processing method using zero-crossing analysis of 1-bit data processing for real-time monitoring of velocity change.* Exploration Geophysics, 1–13.
-                *   **Kontribusi:** Menyajikan alternatif pemrosesan data SPAC berbasis analisis lintasan-nol (*zero-crossing*) dengan pemrosesan data 1-bit untuk pemantauan perubahan kecepatan secara real-time.
-        """)
-        
-    elif topik == "6. Studi Kasus Skripsi (Desa Lonjoboko)":
-        st.markdown(r"""
-            #### 6. Studi Kasus Skripsi & Klasifikasi Kelas Situs
-            
-            Aplikasi web ini dapat digunakan untuk mendukung penelitian geoteknik dan mikrozonasi gempa, seperti studi kasus tugas akhir/skripsi berikut:
-            
-            ##### A. Identitas Penelitian
-            *   **Penulis:** Ahmad Rianul Qauliah (NIM: H061 20 1012)
-            *   **Judul Skripsi:** *Karakterisasi Profil Kecepatan Gelombang Geser Menggunakan Metode SPAC (Spatial Autocorrelation): Studi Kasus Desa Lonjoboko, Gowa*
-            *   **Institusi:** Program Studi Geofisika, Departemen Geofisika, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Hasanuddin, Makassar, 2026.
-            *   **Pembimbing Utama:** Dr. Erfan, M.Si.
-            
-            ##### B. Klasifikasi Kelas Situs ($V_{s30}$)
-            Berdasarkan standar **SNI 1726:2019**, penentuan kelas situs dihitung berdasarkan nilai rata-rata kecepatan gelombang geser hingga kedalaman 30 meter ($V_{s30}$). Persamaan rata-rata harmonik kecepatan tersebut dirumuskan sebagai:
-        """)
-        
-        st.latex(r"V_{s30} = \frac{\sum_{i=1}^{n} d_i}{\sum_{i=1}^{n} \frac{d_i}{V_{si}}}")
-        
-        st.markdown(r"""
-            Dimana:
-            *   $V_{s30}$ adalah kecepatan gelombang geser rata-rata hingga kedalaman 30 meter ($m/s$).
-            *   $d_i$ adalah ketebalan lapisan ke-$i$ ($meter$).
-            *   $V_{si}$ adalah kecepatan gelombang geser lapisan ke-$i$ ($m/s$).
-            *   $\sum_{i=1}^{n} d_i$ adalah kedalaman total yaitu 30 meter.
-            
-            ##### C. Tabel Klasifikasi Situs (SNI 1726:2019)
-            
-            | Kelas Situs | Nama Situs | Kecepatan Gelombang Geser Rata-rata ($V_{s30}$, m/s) |
-            | :---: | :--- | :---: |
-            | **SA** | Batuan Keras | $> 1500$ |
-            | **SB** | Batuan | $750$ sampai $1500$ |
-            | **SC** | Tanah Keras, Sangat Padat, dan Batuan Lunak | $350$ sampai $750$ |
-            | **SD** | Tanah Sedang (Medium) | $175$ sampai $350$ |
-            | **SE** | Tanah Lunak | $< 175$ |
-            | **SF** | Tanah Khusus | Memerlukan investigasi geoteknik spesifik |
-            
-            ##### D. Hasil Pemodelan Desa Lonjoboko, Gowa
-            Berdasarkan hasil inversi kurva dispersi dengan algoritma Monte Carlo, struktur bawah permukaan daerah rawan longsor di Desa Lonjoboko dimodelkan atas 5 lapisan:
-            
-            1.  **Lapisan 1 (0.00 – 4.76 m):** Lempung Berpasir ($V_s = 290.69$ m/s, tebal $4.76$ m) $\rightarrow$ *Tanah Sedang (SD)*
-            2.  **Lapisan 2 (4.76 – 15.17 m):** Pasir Sedang / Medium Stiff Soil ($V_s = 298.40$ m/s, tebal $10.41$ m) $\rightarrow$ *Tanah Sedang (SD)*
-            3.  **Lapisan 3 (15.17 – 29.16 m):** Pasir Padat / Stiff Soil ($V_s = 315.14$ m/s, tebal $13.99$ m) $\rightarrow$ *Tanah Sedang (SD)*
-            4.  **Lapisan 4 (29.16 – 56.20 m):** Batupasir / Very Dense Soil ($V_s = 1075.28$ m/s, tebal $27.04$ m) $\rightarrow$ *Batuan (SC)*
-            5.  **Lapisan 5 (> 56.20 m):** Tufa / Rock ($V_s = 1174.28$ m/s, *half-space*) $\rightarrow$ *Batuan (SC)*
-            
-            Rata-rata kecepatan gelombang geser hingga kedalaman 30 meter ($V_{s30}$) diperoleh sebesar **$302.47$ m/s**. Berdasarkan standar SNI 1726:2019, lokasi penelitian diklasifikasikan sebagai kelas situs **Tanah Sedang (SD)**.
+            1.  Aki, K. (1957). Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
+            2.  Chimoto, K., Onishi, K., & Matsuoka, T. (2023). Simple SPAC processing method using zero-crossing analysis of 1-bit data processing for real-time monitoring of velocity change. *Exploration Geophysics*, 1–13. https://doi.org/10.1186/s40623-023-01842-3
+            3.  Cho, I. (2020). Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747. https://doi.org/10.1093/gji/ggz454
+            4.  Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022). Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627. https://doi.org/10.1007/s10712-018-9474-2
+            5.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
         """)
 
 # ==========================================
@@ -908,8 +854,19 @@ with tab_output:
                 # returns: pv, f_pv, bessel_fit, x_bessel, fitted_avspac
                 pv, f_pv, bessel_fit, x_bessel, fitted_avspac = dc.calculate_dispcurv(min_pv, max_pv)
                 
+                # Hitung rekomendasi rentang frekuensi ideal (kr: 0.3 s.d. 3.8)
+                ideal_mask = (x_bessel >= 0.3) & (x_bessel <= 3.8)
+                if np.any(ideal_mask):
+                    rec_freqs = f_pv[ideal_mask]
+                    f_rec_min = float(np.round(np.min(rec_freqs), 2))
+                    f_rec_max = float(np.round(np.max(rec_freqs), 2))
+                else:
+                    f_rec_min = float(np.round(np.min(f_pv), 2))
+                    f_rec_max = float(np.round(np.max(f_pv), 2))
+                
                 # --- Frequency Cut Feature ---
                 st.markdown("### Pemotongan Rentang Frekuensi Kurva Dispersi")
+                st.info(f"💡 **Saran Rentang Frekuensi Ideal:** `{f_rec_min} Hz` s.d. `{f_rec_max} Hz` (dihitung secara teoritis berdasarkan rentang argumen Bessel $kr$ ideal antara $0.3$ dan $3.8$ untuk menghindari keterbatasan resolusi dan aliasing spasial).")
                 st.write("Sesuaikan rentang frekuensi yang ingin Anda gunakan untuk analisis lebih lanjut:")
                 col_cut1, col_cut2 = st.columns(2)
                 with col_cut1:
