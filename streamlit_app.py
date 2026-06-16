@@ -78,25 +78,25 @@ st.markdown("""
 # Title Area
 st.markdown("""
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; margin-bottom: 1.5rem; text-align: center;">
-        <svg width="240" height="88" viewBox="0 0 165 60" xmlns="http://www.w3.org/2000/svg">
-            <!-- Letters S and P -->
-            <text x="5" y="48" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="48" font-weight="900" fill="#111827">SP</text>
-            <!-- Triangle Lines representing letter A -->
-            <line x1="72" y1="46" x2="92" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
-            <line x1="112" y1="46" x2="92" y2="12" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
-            <line x1="72" y1="46" x2="112" y2="46" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
-            <!-- Vertices & Center Donuts -->
-            <!-- Top Vertex -->
-            <circle cx="92" cy="12" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-            <!-- Bottom-Left Vertex -->
-            <circle cx="72" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-            <!-- Bottom-Right Vertex -->
-            <circle cx="112" cy="46" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-            <!-- Center Node -->
-            <circle cx="92" cy="34.7" r="5.5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-            <!-- Letter C -->
-            <text x="124" y="48" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="48" font-weight="900" fill="#111827">C</text>
-        </svg>
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; letter-spacing: -1.5px; line-height: 1;">SP</span>
+            <svg width="50" height="50" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="margin-left: 4px; margin-right: 4px; margin-bottom: 4px;">
+                <!-- Triangle Lines representing letter A -->
+                <line x1="6" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+                <line x1="38" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+                <line x1="6" y1="36" x2="38" y2="36" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+                <!-- Vertices & Center Donuts -->
+                <!-- Top Vertex -->
+                <circle cx="22" cy="8" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+                <!-- Bottom-Left Vertex -->
+                <circle cx="6" cy="36" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+                <!-- Bottom-Right Vertex -->
+                <circle cx="38" cy="36" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+                <!-- Center Node -->
+                <circle cx="22" cy="26.7" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+            </svg>
+            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; letter-spacing: -1.5px; line-height: 1;">C</span>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
@@ -185,16 +185,16 @@ with tab_input:
         demo_src_dir = "./demo_data"
         if os.path.exists(demo_src_dir):
             try:
-                for demo_file in ["A11.sac", "B11.sac", "A12.sac", "B12.sac", "A13.sac", "B13.sac"]:
+                for demo_file in ["A41.sac", "B41.sac", "A42.sac", "B42.sac", "A43.sac", "B43.sac"]:
                     src_path = os.path.join(demo_src_dir, demo_file)
                     dest_path = os.path.join(main_folder.path_data, demo_file)
                     shutil.copy(src_path, dest_path)
                 st.success("Berhasil memuat Data Demo! Buka tab 'Pemrosesan & Quality Control' untuk mulai memproses.")
                 st.session_state.demo_loaded = True
                 st.session_state.data_list_by_pair = {
-                    "Pair_1": ["A11.sac", "B11.sac"],
-                    "Pair_2": ["A12.sac", "B12.sac"],
-                    "Pair_3": ["A13.sac", "B13.sac"]
+                    "Pair_1": ["A41.sac", "B41.sac"],
+                    "Pair_2": ["A42.sac", "B42.sac"],
+                    "Pair_3": ["A43.sac", "B43.sac"]
                 }
             except Exception as ex:
                 st.error(f"Gagal menyalin data demo: {ex}")
