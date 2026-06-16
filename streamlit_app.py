@@ -5,12 +5,128 @@ import os
 import shutil
 import plotly.graph_objects as go
 import plotly.express as px
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+plt.show = lambda *args, **kwargs: None
 import matplotlib.colors as mcolors
 from scipy.special import jv
+import uuid
 
 # Import spacunhas modules from the local folder
 from spacunhas import environment, readdata, windowing, complexcoherence, spaccoefficient, dispersioncurve
+import math
+
+def suggest_similar_windows(pair_name, wins, path_processing, std_threshold=0.05, f_min_check=1.0, f_max_check=50.0):
+    wins = [int(w) for w in wins]
+    if len(wins) < 3:
+        return sorted(wins), []
+        
+    f_interp = np.linspace(0, 50, 500)
+    spac_matrix = []
+    valid_wins = []
+    
+    for win in sorted(wins):
+        fpath = os.path.join(path_processing, f"{pair_name}pair_spacfunc_window_{win}.txt")
+        if os.path.exists(fpath):
+            try:
+                data = np.loadtxt(fpath, comments='#')
+                if data.ndim == 1:
+                    data = data.reshape(1, -1)
+                f = data[:, 0]
+                c = data[:, 1]
+                c_interp = np.interp(f_interp, f, c)
+                spac_matrix.append(c_interp)
+                valid_wins.append(win)
+            except Exception:
+                continue
+                
+    if not spac_matrix:
+        return sorted(wins), []
+        
+    spac_matrix = np.array(spac_matrix)
+    median_curve = np.median(spac_matrix, axis=0)
+    idx_check = (f_interp >= f_min_check) & (f_interp <= f_max_check)
+    
+    errors = []
+    for i in range(len(valid_wins)):
+        diff = spac_matrix[i, idx_check] - median_curve[idx_check]
+        rmse = np.sqrt(np.mean(diff**2))
+        errors.append(rmse)
+        
+    errors = np.array(errors)
+    mean_error = np.mean(errors)
+    std_error = np.std(errors)
+    cutoff = mean_error + (std_threshold * std_error)
+    
+    is_similar = errors < cutoff
+    suggested = [valid_wins[i] for i in range(len(valid_wins)) if is_similar[i]]
+    outliers = [valid_wins[i] for i in range(len(valid_wins)) if not is_similar[i]]
+    
+    if not suggested:
+        return sorted(wins), []
+        
+    return sorted(suggested), sorted(outliers)
+
+def plot_coherence_grid_for_pair(pair_name, wins, path_processing):
+    wins = [int(w) for w in wins]
+    file_list = []
+    for win in sorted(wins):
+        fpath = os.path.join(path_processing, f"{pair_name}pair_spacfunc_window_{win}.txt")
+        if os.path.exists(fpath):
+            file_list.append((win, fpath))
+            
+    jumlah_file = len(file_list)
+    if jumlah_file == 0:
+        st.warning(f"Tidak ada file koherensi untuk {pair_name}")
+        return
+        
+    n_cols = 3
+    n_rows = math.ceil(jumlah_file / n_cols)
+    
+    fig_width = n_cols * 4.0
+    fig_height = n_rows * 2.5
+    
+    fig, axes = plt.subplots(
+        n_rows, n_cols,
+        figsize=(fig_width, fig_height),
+        sharex=True, sharey=True
+    )
+    
+    if not isinstance(axes, np.ndarray):
+        axes_flat = [axes]
+    else:
+        axes_flat = axes.flatten()
+        
+    for i in range(len(axes_flat)):
+        ax = axes_flat[i]
+        if i < jumlah_file:
+            win_num, fpath = file_list[i]
+            try:
+                data = np.loadtxt(fpath, comments='#')
+                if data.ndim == 1:
+                    data = data.reshape(1, -1)
+                freq = data[:, 0]
+                spac_val = data[:, 1]
+                
+                ax.plot(freq, spac_val, 'k-o', markersize=0.5, linewidth=0.5, alpha=0.7)
+                ax.axhline(0, color='r', linestyle='--', linewidth=0.8, alpha=0.5)
+                ax.set_title(f"Window {win_num}", fontsize=10, fontweight='bold')
+                ax.grid(True, linestyle=':', alpha=0.6)
+                ax.set_xlim(0, 50)
+                ax.set_ylim(-1.1, 1.1)
+            except Exception as e:
+                ax.text(0.5, 0.5, 'Error', ha='center', va='center', color='red')
+        else:
+            ax.axis('off')
+            
+    fig.text(0.5, 0.005, 'Frekuensi (Hz)', ha='center', fontsize=12, fontweight='bold')
+    fig.text(0.005, 0.5, 'Koefisien SPAC', va='center', rotation='vertical', fontsize=12, fontweight='bold')
+    plt.suptitle(f"Grid Koherensi SPAC - {pair_name}", fontsize=14, y=0.98)
+    plt.tight_layout(rect=[0.02, 0.02, 1, 0.95])
+    
+    st.pyplot(fig)
+    plt.close(fig)
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -102,6 +218,9 @@ st.markdown("""
 st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
 
 # --- Session State Initialization ---
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+
 if "step" not in st.session_state:
     st.session_state.step = "input"  # steps: input, computed_coherence, final_fit
 if "coherence_calculated" not in st.session_state:
@@ -109,12 +228,12 @@ if "coherence_calculated" not in st.session_state:
 if "data_list_by_pair" not in st.session_state:
     st.session_state.data_list_by_pair = {}
 if "main_folder_path" not in st.session_state:
-    st.session_state.main_folder_path = "./workspace"
+    st.session_state.main_folder_path = os.path.join("./workspace", st.session_state.session_id)
 
 # --- Sidebar Parameter Inputs ---
 st.sidebar.header("Parameter Pemrosesan")
 
-working_dir = st.sidebar.text_input("Folder Direktori Kerja", value=st.session_state.main_folder_path)
+working_dir = st.sidebar.text_input("Folder Direktori Kerja (Terisolasi per Sesi)", value=st.session_state.main_folder_path)
 st.session_state.main_folder_path = working_dir
 
 radius = st.sidebar.number_input("Jarak Radius Array (m)", min_value=0.1, value=4.62, step=0.01)
@@ -325,52 +444,105 @@ with tab_processing:
         if st.session_state.coherence_calculated:
             st.markdown("---")
             st.markdown("### Quality Control: Seleksi Jendela Koherensi")
-            st.write("Peta koherensi per jendela waktu telah dihitung. Pilih jendela waktu yang bersih (bebas dari transisi noise atau spike) untuk dirata-ratakan (stacking):")
+            st.write("Visualisasikan semua jendela koherensi dan gunakan fitur saran otomatis untuk menyaring data yang mirip/konsisten:")
 
-            # Determine maximum windows among the computed pairs
-            max_win = max(st.session_state.n_windows_found.values())
-            all_wins = list(range(1, max_win + 1))
-            
-            # Interactive Multi-select widget
-            # Default selections (e.g. typical clean windows from user's thesis)
-            default_clean = [w for w in all_wins if w not in [1, 4, 7]] if len(all_wins) >= 7 else all_wins
-            window_bersih = st.multiselect(
-                "Pilih nomor window bersih yang akan di-stacking:",
-                options=all_wins,
-                default=default_clean
+            # Initialize SPAC coefficient class using the first pair's info
+            first_pair_key = list(st.session_state.data_list_by_pair.keys())[0]
+            spaccoeff = spaccoefficient.SPACCoefficient(
+                st.session_state.last_spac_coef_obj,
+                st.session_state.windowing_objs[first_pair_key],
+                radius=radius
             )
             
-            if not window_bersih:
-                st.warning("Mohon pilih setidaknya 1 window bersih.")
-            else:
-                # Initialize SPAC coefficient class
-                # Note: SPACCoefficient constructor takes (coherence_processing, windowing_processing, radius)
-                # We use the last coherence and windowing object to initialize
-                first_pair_key = list(st.session_state.data_list_by_pair.keys())[0]
-                spaccoeff = spaccoefficient.SPACCoefficient(
-                    st.session_state.last_spac_coef_obj,
-                    st.session_state.windowing_objs[first_pair_key],
-                    radius=radius
+            # Fetch available files in processing
+            list_coh, pairs_win, pairs = spaccoeff.list_coherence_file()
+
+            # Expandable Settings for Similarity Threshold
+            with st.expander("⚙️ Pengaturan Parameter Saran Window Otomatis"):
+                std_threshold = st.slider("Tingkat Ketatnya Seleksi (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
+                f_min_check = st.number_input("Rentang Frekuensi Min (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
+                f_max_check = st.number_input("Rentang Frekuensi Max (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
+
+            selected_pairs_win = {}
+            
+            # Group selections and plots by pair
+            for pair_name, wins in sorted(pairs_win.items()):
+                st.markdown(f"#### 📊 Analisis & Seleksi: Sesi {pair_name}")
+                
+                # 1. Display grid of all coherence windows for this pair
+                with st.expander(f"👁️ Tampilkan Grid Plot Koherensi - Sesi {pair_name}", expanded=False):
+                    plot_coherence_grid_for_pair(pair_name, wins, os.path.join(working_dir, "processing"))
+                
+                # 2. Get similarity suggestions
+                suggested_wins, outlier_wins = suggest_similar_windows(
+                    pair_name, wins, os.path.join(working_dir, "processing"),
+                    std_threshold=std_threshold, f_min_check=f_min_check, f_max_check=f_max_check
                 )
                 
-                # Fetch available files in processing
-                list_coh, pairs_win, pairs = spaccoeff.list_coherence_file()
+                # 3. Display suggestions
+                col_sug1, col_sug2 = st.columns(2)
+                with col_sug1:
+                    st.success(f"✅ **Saran Window Konsisten**: {suggested_wins}")
+                with col_sug2:
+                    if outlier_wins:
+                        st.warning(f"⚠️ **Window Outlier (Tidak Disarankan)**: {outlier_wins}")
+                    else:
+                        st.info("ℹ️ **Window Outlier**: Tidak ada outlier terdeteksi.")
                 
-                # Setup selected_pairs_win dictionary
-                selected_pairs_win = {}
-                for pair_name in pairs_win.keys():
-                    selected_pairs_win[pair_name] = window_bersih
+                # 4. Multiselect widget for this pair, default to suggested_wins
+                selected_wins = st.multiselect(
+                    f"Pilih nomor window untuk di-stacking ({pair_name}):",
+                    options=sorted([int(w) for w in wins]),
+                    default=suggested_wins,
+                    key=f"select_{pair_name}"
+                )
+                selected_pairs_win[pair_name] = selected_wins
+                st.markdown("---")
+
+            # --- Two-Stage Stacking ---
+            pair_averages = {}
+            freq = None
+
+            for pair_name, sel_win in selected_pairs_win.items():
+                if not sel_win:
+                    continue
+                all_rho = []
+                for win in sel_win:
+                    fpath = os.path.join(working_dir, "processing", f"{pair_name}pair_spacfunc_window_{win}.txt")
+                    if os.path.exists(fpath):
+                        data = np.loadtxt(fpath)
+                        if data.ndim == 1:
+                            data = data.reshape(1, -1)
+                        freq = data[:, 0]
+                        rho = data[:, 1]
+                        all_rho.append(rho)
+                if all_rho:
+                    # Stage 1: Average for each pair
+                    pair_averages[pair_name] = np.mean(all_rho, axis=0)
+
+            if not pair_averages:
+                st.error("Mohon pilih setidaknya 1 window bersih pada salah satu sesi untuk melakukan Stacking.")
+            else:
+                # Stage 2: Average across all active pairs
+                avspac = np.mean(list(pair_averages.values()), axis=0)
                 
-                # Calculate average SPAC
-                freq, avspac = spaccoeff.avspac((list_coh, pairs_win, pairs), selected_pairs_win)
+                # Update spaccoeff properties so they are accessible to Tab 3
+                spaccoeff.frequency = [freq]
+                spaccoeff.spaccoefficient = [avspac]
                 
+                # Save stacked SPAC to file (as original code did)
+                np.savetxt(f'{working_dir}/processing/avspac_radii{radius}.txt', 
+                           np.column_stack((freq, avspac)), 
+                           header='#Frequency (Hz) #SPACCoefficient')
+
                 # Save objects for tab 3
                 st.session_state.spaccoeff_obj = spaccoeff
                 st.session_state.freq_stacked = freq
                 st.session_state.avspac_stacked = avspac
                 
                 # --- Visualizations ---
-                st.markdown("#### Hasil Stacking SPAC Coefficient")
+                st.markdown("### Hasil Stacking SPAC Coefficient Akhir")
+                st.write("Kurva di bawah ini adalah hasil rata-rata dua tahap (rata-rata per sesi, lalu dirata-ratakan antar sesi):")
                 
                 # Plotly Plot for observed SPAC coefficient
                 fig_spac = go.Figure()
@@ -378,32 +550,25 @@ with tab_processing:
                     x=freq,
                     y=avspac,
                     mode='lines+markers',
-                    name='Rata-rata (Stacked)',
+                    name='Rata-rata Dua Tahap (Stacked)',
                     line=dict(color='black', width=2),
                     marker=dict(size=4)
                 ))
                 
-                # Optional: Plot individual window coherences in light gray
-                # We can load files and plot them
-                try:
-                    for pair_name, wins in pairs_win.items():
-                        for win in wins:
-                            file_p = os.path.join(working_dir, "processing", f"{pair_name}pair_spacfunc_window_{win}.txt")
-                            if os.path.exists(file_p):
-                                single_data = np.loadtxt(file_p)
-                                fig_spac.add_trace(go.Scatter(
-                                    x=single_data[:, 0],
-                                    y=single_data[:, 1],
-                                    mode='lines',
-                                    line=dict(color='lightgray', width=0.5),
-                                    showlegend=False
-                                ))
-                except Exception:
-                    pass
+                # Optional: Plot individual pair averages in light colors for comparison
+                colors_pair = {'Pair_1': 'rgba(255, 75, 75, 0.6)', 'Pair_2': 'rgba(75, 200, 75, 0.6)', 'Pair_3': 'rgba(75, 75, 255, 0.6)'}
+                for pair_name, pair_avg in pair_averages.items():
+                    fig_spac.add_trace(go.Scatter(
+                        x=freq,
+                        y=pair_avg,
+                        mode='lines',
+                        name=f'Rata-rata Sesi {pair_name}',
+                        line=dict(color=colors_pair.get(pair_name, 'lightgray'), width=1.5, dash='dash')
+                    ))
                 
                 fig_spac.update_layout(
                      title=dict(
-                         text="Koefisien SPAC Rata-rata vs Frekuensi",
+                         text="Koefisien SPAC Akhir vs Frekuensi",
                          font=dict(color="black")
                      ),
                      xaxis=dict(
