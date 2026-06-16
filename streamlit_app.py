@@ -221,12 +221,24 @@ with tab_processing:
                         data_init = readdata.ReadData(main_folder, files, 'SAC')
                         datas = data_init.read_data()
                         
+                        # Show windowed data plots side-by-side
+                        st.markdown(f"##### 📊 Visualisasi Windowed Data - Sesi {pair_key}")
+                        col_w1, col_w2 = st.columns(2)
+                        
                         # Windowing for each file
-                        for filename in files:
+                        for idx_file, filename in enumerate(files):
                             # Use current config window size
                             data_windowing = windowing.Windowing(main_folder, data_init, window_size)
                             # Windowing returns self.n_window, self.x, self.y
                             list_data = data_windowing.windowing(filename)
+                            
+                            # Plot it and show in Streamlit
+                            with (col_w1 if idx_file == 0 else col_w2):
+                                st.write(f"Receiver: `{filename}`")
+                                data_windowing.plot_windows()
+                                fig = plt.gcf()
+                                st.pyplot(fig)
+                                plt.close(fig)
                             
                         # Save window info
                         windowing_objs[pair_key] = data_windowing
@@ -337,14 +349,35 @@ with tab_processing:
                     pass
                 
                 fig_spac.update_layout(
-                    title="Koefisien SPAC Rata-rata vs Frekuensi",
-                    xaxis_title="Frekuensi (Hz)",
-                    yaxis_title="Koefisien SPAC",
-                    xaxis_range=[0, 50],
-                    yaxis_range=[-1.1, 1.1],
-                    template="plotly_white",
-                    height=500
-                )
+                     title="Koefisien SPAC Rata-rata vs Frekuensi",
+                     xaxis_title="Frekuensi (Hz)",
+                     yaxis_title="Koefisien SPAC",
+                     xaxis_range=[0, 50],
+                     yaxis_range=[-1.1, 1.1],
+                     template="plotly_white",
+                     height=500,
+                     plot_bgcolor="white",
+                     paper_bgcolor="white",
+                     xaxis=dict(
+                         showgrid=True,
+                         gridcolor="lightgray",
+                         linecolor="black",
+                         ticks="outside",
+                         tickcolor="black",
+                         tickfont=dict(color="black"),
+                         titlefont=dict(color="black")
+                     ),
+                     yaxis=dict(
+                         showgrid=True,
+                         gridcolor="lightgray",
+                         linecolor="black",
+                         ticks="outside",
+                         tickcolor="black",
+                         tickfont=dict(color="black"),
+                         titlefont=dict(color="black")
+                     ),
+                     title_font=dict(color="black")
+                 )
                 fig_spac.add_hline(y=0, line_dash="dash", line_color="red", line_width=1)
                 
                 st.plotly_chart(fig_spac, use_container_width=True)
@@ -375,15 +408,30 @@ with tab_output:
                 # returns: pv, f_pv, bessel_fit, x_bessel, fitted_avspac
                 pv, f_pv, bessel_fit, x_bessel, fitted_avspac = dc.calculate_dispcurv(min_pv, max_pv)
                 
+                # --- Frequency Cut Feature ---
+                st.markdown("### ✂️ Pemotongan Rentang Frekuensi Kurva Dispersi")
+                st.write("Sesuaikan rentang frekuensi yang ingin Anda gunakan untuk analisis lebih lanjut:")
+                col_cut1, col_cut2 = st.columns(2)
+                with col_cut1:
+                    f_min_val = float(np.round(np.min(f_pv), 2))
+                    cut_f_min = st.number_input("Frekuensi Minimum Cut (Hz)", min_value=0.0, max_value=100.0, value=max(0.0, f_min_val), step=0.1)
+                with col_cut2:
+                    f_max_val = float(np.round(np.max(f_pv), 2))
+                    cut_f_max = st.number_input("Frekuensi Maximum Cut (Hz)", min_value=0.0, max_value=100.0, value=min(50.0, f_max_val), step=0.1)
+                
+                # Apply filter
+                mask_cut = (f_pv >= cut_f_min) & (f_pv <= cut_f_max)
+                f_pv_cut = f_pv[mask_cut]
+                pv_cut = pv[mask_cut]
+                x_bessel_cut = x_bessel[mask_cut]
+                bessel_fit_cut = bessel_fit[mask_cut]
+                avspac_dec_cut = avspac_dec[mask_cut]
+
                 # --- Visualizations ---
                 col_c1, col_c2 = st.columns(2)
                 
                 with col_c1:
                     st.markdown("#### 🎯 Fitting Fungsi Bessel J0")
-                    # Plot observed SPAC coefficients vs Bessel fit
-                    # Bessel arg: x = (2 * pi * f * r) / pv
-                    # Observed y: avspac_dec
-                    # Fitted y: J_0(x)
                     
                     fig_bessel = go.Figure()
                     
@@ -398,13 +446,22 @@ with tab_output:
                         line=dict(color='red', width=2)
                     ))
                     
-                    # Observed Data points plotted at the calculated Bessel coordinates
+                    # Observed Data points plotted at the calculated Bessel coordinates (Show all points in gray, active in black)
                     fig_bessel.add_trace(go.Scatter(
                         x=x_bessel,
                         y=avspac_dec,
                         mode='markers',
-                        name='Data Lapangan (Observed)',
-                        marker=dict(color='black', size=6)
+                        name='Data Lapangan (Luar Rentang)',
+                        marker=dict(color='lightgray', size=5),
+                        showlegend=True
+                    ))
+                    
+                    fig_bessel.add_trace(go.Scatter(
+                        x=x_bessel_cut,
+                        y=avspac_dec_cut,
+                        mode='markers',
+                        name='Data Lapangan (Aktif)',
+                        marker=dict(color='black', size=7)
                     ))
                     
                     fig_bessel.update_layout(
@@ -414,7 +471,29 @@ with tab_output:
                         xaxis_range=[0, 10],
                         yaxis_range=[-1.1, 1.1],
                         template="plotly_white",
-                        height=450
+                        height=450,
+                        plot_bgcolor="white",
+                        paper_bgcolor="white",
+                        xaxis=dict(
+                            showgrid=True,
+                            gridcolor="lightgray",
+                            linecolor="black",
+                            ticks="outside",
+                            tickcolor="black",
+                            tickfont=dict(color="black"),
+                            titlefont=dict(color="black")
+                        ),
+                        yaxis=dict(
+                            showgrid=True,
+                            gridcolor="lightgray",
+                            linecolor="black",
+                            ticks="outside",
+                            tickcolor="black",
+                            tickfont=dict(color="black"),
+                            titlefont=dict(color="black")
+                        ),
+                        title_font=dict(color="black"),
+                        legend=dict(font=dict(color="black"))
                     )
                     fig_bessel.add_hline(y=0, line_dash="dash", line_color="gray")
                     st.plotly_chart(fig_bessel, use_container_width=True)
@@ -422,15 +501,26 @@ with tab_output:
                 with col_c2:
                     st.markdown("#### 📈 Kurva Dispersi Rayleigh")
                     
-                    # Plotly scatter for Dispersion Curve
                     fig_disp = go.Figure()
+                    
+                    # Full Curve (Gray)
                     fig_disp.add_trace(go.Scatter(
                         x=f_pv,
                         y=pv,
                         mode='lines+markers',
-                        name='Kurva Dispersi',
-                        line=dict(color='blue', width=2),
-                        marker=dict(color='darkblue', size=5)
+                        name='Semua Frekuensi',
+                        line=dict(color='lightgray', width=1),
+                        marker=dict(color='lightgray', size=4)
+                    ))
+                    
+                    # Cut Curve (Blue)
+                    fig_disp.add_trace(go.Scatter(
+                        x=f_pv_cut,
+                        y=pv_cut,
+                        mode='lines+markers',
+                        name='Rentang Terpotong (Aktif)',
+                        line=dict(color='blue', width=2.5),
+                        marker=dict(color='darkblue', size=6)
                     ))
                     
                     fig_disp.update_layout(
@@ -440,7 +530,29 @@ with tab_output:
                         xaxis_range=[0, 50],
                         yaxis_range=[min_pv, max_pv],
                         template="plotly_white",
-                        height=450
+                        height=450,
+                        plot_bgcolor="white",
+                        paper_bgcolor="white",
+                        xaxis=dict(
+                            showgrid=True,
+                            gridcolor="lightgray",
+                            linecolor="black",
+                            ticks="outside",
+                            tickcolor="black",
+                            tickfont=dict(color="black"),
+                            titlefont=dict(color="black")
+                        ),
+                        yaxis=dict(
+                            showgrid=True,
+                            gridcolor="lightgray",
+                            linecolor="black",
+                            ticks="outside",
+                            tickcolor="black",
+                            tickfont=dict(color="black"),
+                            titlefont=dict(color="black")
+                        ),
+                        title_font=dict(color="black"),
+                        legend=dict(font=dict(color="black"))
                     )
                     fig_disp.update_yaxes(type="linear")
                     st.plotly_chart(fig_disp, use_container_width=True)
@@ -449,8 +561,8 @@ with tab_output:
                 st.markdown("---")
                 st.markdown("### 📥 Ekspor Hasil Analisis")
                 
-                # Save dispersion data to a pandas dataframe
-                export_df = pd.DataFrame({
+                # Full Dataframe
+                export_df_full = pd.DataFrame({
                     "Frequency_Hz": f_pv,
                     "Phase_Velocity_ms": pv,
                     "Bessel_Argument": x_bessel,
@@ -458,18 +570,38 @@ with tab_output:
                     "SPAC_Coefficient_Observed": avspac_dec
                 })
                 
-                # Show preview
-                st.write("Pratinjau Data Kurva Dispersi:")
-                st.dataframe(export_df.head(10), use_container_width=True)
+                # Cut Dataframe
+                export_df_cut = pd.DataFrame({
+                    "Frequency_Hz": f_pv_cut,
+                    "Phase_Velocity_ms": pv_cut,
+                    "Bessel_Argument": x_bessel_cut,
+                    "Bessel_Fit": bessel_fit_cut,
+                    "SPAC_Coefficient_Observed": avspac_dec_cut
+                })
                 
-                # Download button
-                csv_data = export_df.to_csv(index=False)
-                st.download_button(
-                    label="💾 Unduh Kurva Dispersi (CSV)",
-                    data=csv_data,
-                    file_name=f"dispersion_curve_radius_{radius}m.csv",
-                    mime="text/csv"
-                )
+                # Show preview of cut data
+                st.write("Pratinjau Data Kurva Dispersi Terpotong (Aktif):")
+                st.dataframe(export_df_cut, use_container_width=True)
+                
+                col_btn1, col_btn2 = st.columns(2)
+                with col_btn1:
+                    csv_full = export_df_full.to_csv(index=False)
+                    st.download_button(
+                        label="💾 Unduh Kurva Dispersi Penuh (CSV)",
+                        data=csv_full,
+                        file_name=f"dispersion_curve_FULL_radius_{radius}m.csv",
+                        mime="text/csv",
+                        key="btn_full"
+                    )
+                with col_btn2:
+                    csv_cut = export_df_cut.to_csv(index=False)
+                    st.download_button(
+                        label="✂️ Unduh Kurva Dispersi Terpotong (CSV)",
+                        data=csv_cut,
+                        file_name=f"dispersion_curve_CUT_{cut_f_min:.1f}to{cut_f_max:.1f}Hz.csv",
+                        mime="text/csv",
+                        key="btn_cut"
+                    )
                 
 
                 
