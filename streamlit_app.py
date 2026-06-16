@@ -492,25 +492,22 @@ with tab_input:
     col_s1, col_s2, col_s3 = st.columns(3)
     
     with col_s1:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.markdown("### Sesi 1 (A - B1)")
+        st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
         file_a1 = st.file_uploader("Upload Pusat A Sesi 1", type=["sac", "mseed"], key="file_a1")
         file_b1 = st.file_uploader("Upload Keliling B1 Sesi 1", type=["sac", "mseed"], key="file_b1")
-        st.markdown('</div>', unsafe_allow_html=True)
         
     with col_s2:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.markdown("### Sesi 2 (A - B2)")
+        st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
         file_a2 = st.file_uploader("Upload Pusat A Sesi 2", type=["sac", "mseed"], key="file_a2")
         file_b2 = st.file_uploader("Upload Keliling B2 Sesi 2", type=["sac", "mseed"], key="file_b2")
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_s3:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.markdown("### Sesi 3 (A - B3)")
+        st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
         file_a3 = st.file_uploader("Upload Pusat A Sesi 3", type=["sac", "mseed"], key="file_a3")
         file_b3 = st.file_uploader("Upload Keliling B3 Sesi 3", type=["sac", "mseed"], key="file_b3")
-        st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("---")
     
