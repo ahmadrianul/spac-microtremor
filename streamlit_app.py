@@ -288,14 +288,14 @@ with tab_teori:
         st.markdown(r"""
             #### 1. Pengantar & Konsep Dasar SPAC (Spatial Autocorrelation)
             
-            Metode **Spatial Autocorrelation (SPAC)** merupakan salah satu metode geofisika pasif non-invasif yang sangat populer digunakan untuk mengestimasi struktur kecepatan gelombang geser ($V_s$) satu dimensi (1D) bawah permukaan.
+            Metode Spatial Autocorrelation (SPAC) merupakan salah satu metode geofisika pasif non-invasif yang sangat populer digunakan untuk mengestimasi struktur kecepatan gelombang geser ($V_s$) satu dimensi (1D) bawah permukaan.
             
             ##### A. Prinsip Dasar
-            Berbeda dengan metode seismik aktif tradisional (seperti MASW atau seismik refraksi) yang memerlukan sumber getaran buatan seperti palu godam (*sledgehammer*) atau peledak, metode SPAC memanfaatkan getaran alami bumi yang dikenal sebagai **ambient noise** atau **mikrotremor**. Getaran ini bersumber dari:
+            Berbeda dengan metode seismik aktif tradisional (seperti MASW atau seismik refraksi) yang memerlukan sumber getaran buatan seperti palu godam (*sledgehammer*) atau peledak, metode SPAC memanfaatkan getaran alami bumi yang dikenal sebagai ambient noise atau mikrotremor. Getaran ini bersumber dari:
             *   **Aktivitas Alam:** Gelombang laut, pergerakan angin, interaksi atmosfer, aktivitas tektonik mikro.
             *   **Aktivitas Manusia:** Lalu lintas kendaraan, getaran mesin pabrik/industri, langkah kaki manusia, dan aktivitas perkotaan lainnya.
             
-            Mikrotremor ini didominasi oleh gelombang permukaan (terutama **gelombang Rayleigh**) yang merambat secara horizontal di dekat permukaan bumi.
+            Mikrotremor ini didominasi oleh gelombang permukaan (terutama gelombang Rayleigh) yang merambat secara horizontal di dekat permukaan bumi.
             
             ##### B. Keunggulan Metode SPAC
             1.  **Non-Invasif & Non-Destruktif:** Tidak memerlukan pengeboran lubang bor (seperti pada metode SPT atau downhole/crosshole) yang mahal dan dapat merusak permukaan tanah, sehingga sangat ramah lingkungan.
@@ -304,7 +304,7 @@ with tab_teori:
             4.  **Ekonomis & Praktis:** Mengurangi biaya operasional lapangan dan mempermudah mobilisasi peralatan di area dengan topografi yang sulit.
             
             ##### C. Sejarah Singkat
-            Teori Spatial Autocorrelation pertama kali diformulasikan secara matematis oleh geofisikawan Jepang, **Keiiti Aki (1957)**. Beliau membuktikan secara matematis bahwa korelasi statistik dari getaran ambient noise yang direkam secara simultan pada beberapa stasiun penerima dapat digunakan untuk mengekstrak kurva dispersi gelombang permukaan. Teori ini kemudian dikembangkan dan disempurnakan menjadi metode praktis siap pakai untuk eksplorasi oleh **Hiroshi Okada (2003)** melalui bukunya yang terkenal, *"The Microtremor Survey Method"*.
+            Teori Spatial Autocorrelation pertama kali diformulasikan secara matematis oleh geofisikawan Jepang, Keiiti Aki (1957). Beliau membuktikan secara matematis bahwa korelasi statistik dari getaran ambient noise yang direkam secara simultan pada beberapa stasiun penerima dapat digunakan untuk mengekstrak kurva dispersi gelombang permukaan. Teori ini kemudian dikembangkan dan disempurnakan menjadi metode praktis siap pakai untuk eksplorasi oleh Hiroshi Okada (2003) melalui bukunya yang terkenal, *"The Microtremor Survey Method"*.
         """)
         
     elif topik == "2. Formulasi Matematis & Rumus":
@@ -392,11 +392,11 @@ with tab_teori:
             Secara konvensional, survei SPAC memerlukan susunan sensor (*array*) melingkar atau segitiga sama sisi yang merekam secara simultan (minimal menggunakan 4 geofon: 1 pusat, 3 keliling). Namun, konfigurasi tersebut membutuhkan banyak peralatan geofon dan kabel bentangan yang rumit.
             
             ##### A. Konsep Metode Dua Sensor (Two-Station Method)
-            Untuk meningkatkan efisiensi di lapangan, metode **SPAC Sekuensial (Two-Station Method)** dapat diterapkan hanya dengan menggunakan **2 buah geofon** (seperti unit sensor SmartSolo 3C).
+            Untuk meningkatkan efisiensi di lapangan, metode SPAC Sekuensial (Two-Station Method) dapat diterapkan hanya dengan menggunakan 2 buah geofon (seperti unit sensor SmartSolo 3C).
             
             Sinyal direkam secara bertahap (sekuensial) dengan konfigurasi geometri segitiga sama sisi sebagai berikut:
             1.  **Geofon Referensi Tetap (Pusat A):** Diletakkan tetap di titik pusat koordinat selama seluruh sesi pengukuran.
-            2.  **Geofon Bergerak (Rover B):** Dipindahkan secara berurutan ke stasiun keliling lingkaran pada radius $r$ yang sama, yaitu di titik **B1**, **B2**, dan **B3** (membentuk sudut pisah $120^\circ$ satu sama lain).
+            2.  **Geofon Bergerak (Rover B):** Dipindahkan secara berurutan ke stasiun keliling lingkaran pada radius $r$ yang sama, yaitu di titik B1, B2, dan B3 (membentuk sudut pisah $120^\circ$ satu sama lain).
             
             Perekaman dilakukan selama durasi tertentu pada masing-masing dari 3 stasiun pasangan (A-B1 pada Sesi 1, A-B2 pada Sesi 2, dan A-B3 pada Sesi 3).
         """)
@@ -426,21 +426,20 @@ with tab_teori:
                     <circle cx="165" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
                     <text x="165" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
                     <!-- Radius Text -->
-                    <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r) = 4.62 m</text>
+                    <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
                 </svg>
             </div>
         """, unsafe_allow_html=True)
         
         st.markdown(r"""
-            ##### B. Parameter Akuisisi Data Lapangan (Studi Kasus)
-            *   **Radius Array ($r$):** $4.62$ meter (jarak konstan dari pusat A ke stasiun lingkaran B1, B2, B3).
-            *   **Sisi Segitiga Keliling ($B_1-B_2-B_3$):** $8.0$ meter.
+            ##### B. Parameter Akuisisi Data Lapangan
+            *   **Radius Array ($r$):** $r$ (jari-jari array segitiga lapangan).
             *   **Durasi Perekaman:** minimal 20 menit untuk masing-masing stasiun pasangan (total ~60 menit perekaman).
-            *   **Sampling Rate:** 100 Hz.
-            *   **Sensor Geofon:** Geofon SmartSolo IGU-16HR 3C 2Hz (diambil komponen vertikal).
+            *   **Sampling Rate:** 100 Hz (diperoleh langsung dari metadata/header file rekaman seismik .sac/.mseed yang diunggah).
+            *   **Sensor Geofon:** Geofon (komponen vertikal).
             
             ##### C. Asumsi Kunci
-            Metode ini sangat bergantung pada asumsi bahwa **medan getaran ambient noise bersifat stasioner** (karakteristik statistiknya stabil dan tidak berubah) sepanjang total durasi perekaman ketiga sesi tersebut. Rata-rata azimuthal disimulasikan secara numerik saat pemrosesan data dengan merata-ratakan hasil koherensi silang dari ketiga stasiun pasangan yang direkam secara terpisah tersebut.
+            Metode ini sangat bergantung pada asumsi bahwa medan getaran ambient noise bersifat stasioner (karakteristik statistiknya stabil dan tidak berubah) sepanjang total durasi perekaman ketiga sesi tersebut. Rata-rata azimuthal disimulasikan secara numerik saat pemrosesan data dengan merata-ratakan hasil koherensi silang dari ketiga stasiun pasangan yang direkam secara terpisah tersebut.
         """)
         
     elif topik == "4. Alur Pengolahan Data (Step-by-Step)":
@@ -450,7 +449,7 @@ with tab_teori:
             Proses pengolahan data mikrotremor metode SPAC sekuensial dari berkas mentah hingga menjadi kurva dispersi final dilakukan melalui tahapan berikut:
             
             1.  **Input Data Seismogram:**
-                Membaca file rekaman biner seismik berformat **SAC** atau **MINISEED** untuk stasiun referensi (A) dan stasiun keliling (B) untuk masing-masing sesi (Pair 1, Pair 2, Pair 3).
+                Membaca file rekaman biner seismik berformat SAC atau MINISEED untuk stasiun referensi (A) dan stasiun keliling (B) untuk masing-masing sesi (Pair 1, Pair 2, Pair 3).
             2.  **Segmentasi Waktu (Windowing):**
                 Sinyal kontinu berdurasi panjang disegmentasi menjadi sejumlah jendela waktu yang lebih pendek (misalnya panjang jendela sebesar $2^{13} = 8192$ sampel atau setara 81.92 detik pada sampling rate 100 Hz) dengan *overlap* tertentu. Hal ini berguna untuk mengisolasi segmen data yang stasioner dan membuang gangguan transient noise lokal (seperti getaran akibat kendaraan yang lewat sangat dekat).
             3.  **Transformasi Spektral (FFT):**
@@ -459,12 +458,12 @@ with tab_teori:
                 Kompleks koherensi dihitung pada setiap frekuensi untuk setiap jendela waktu pada masing-masing sesi stasiun pasangan (A-B1, A-B2, A-B3).
             5.  **Quality Control (QC) & Seleksi Jendela Otomatis:**
                 *   **Evaluasi RMSE:** Aplikasi menghitung selisih (Root Mean Square Error / RMSE) antara nilai koherensi setiap jendela terhadap nilai median koherensi pada rentang frekuensi kontrol (1 - 50 Hz).
-                *   **Saran Window:** Jendela dengan RMSE di bawah batas cutoff (misalnya median + 0.05 standar deviasi) diklasifikasikan sebagai **jendela bersih (konsisten)**, sedangkan jendela dengan RMSE tinggi diklasifikasikan sebagai **outlier (noise)** dan disarankan untuk dibuang.
+                *   **Saran Window:** Jendela dengan RMSE di bawah batas cutoff (misalnya median + 0.05 standar deviasi) diklasifikasikan sebagai jendela bersih (konsisten), sedangkan jendela dengan RMSE tinggi diklasifikasikan sebagai outlier (noise) dan disarankan untuk dibuang.
             6.  **Rata-rata Dua Tahap (Two-Stage Stacking):**
                 *   *Tahap 1:* Jendela-jendela yang terpilih di dalam masing-masing sesi dirata-ratakan secara independen untuk mendapatkan kurva koefisien SPAC Sesi 1 ($\rho_1$), Sesi 2 ($\rho_2$), dan Sesi 3 ($\rho_3$).
                 *   *Tahap 2:* Ketiga kurva rata-rata sesi tersebut kemudian dirata-ratakan secara bersama-sama untuk mendapatkan kurva koefisien SPAC akhir ($\rho_{avg}$). Hal ini penting untuk menjamin pembobotan spasial yang seimbang dari segala arah sensor.
             7.  **Pencocokan Fungsi Bessel (Bessel Fitting):**
-                Nilai koefisien SPAC rata-rata akhir $\rho_{avg}(f)$ dicocokkan dengan kurva Bessel teoritis $J_0(x)$ menggunakan metode kuadrat terkecil (*least-squares fitting*) untuk memperoleh nilai argumen Bessel $x = kr$ pada setiap frekuensi.
+                Nilai koefisien SPAC rata-rata akhir $\rho_{avg}(f)$ dicocokkan dengan kurva Bessel teoritis $J_0(x)$ menggunakan metode kuadrat terkecil (*least-squares fitting*) to memperoleh nilai argumen Bessel $x = kr$ pada setiap frekuensi.
             8.  **Ekstraksi Kurva Dispersi:**
                 Kecepatan fase Rayleigh dihitung menggunakan rumus $c(f) = \frac{2\pi f r}{x}$. Hasilnya kemudian disaring dalam batasan kecepatan fase minimum dan maksimum, serta dapat dipotong (*frequency cut*) pada rentang frekuensi yang bersih dari noise.
         """)
@@ -473,7 +472,7 @@ with tab_teori:
         st.markdown(r"""
             #### 5. Dukungan Artikel & Jurnal Ilmiah
             
-            Berikut adalah daftar pustaka artikel ilmiah utama yang melandasi metode SPAC sekuensial, disusun secara alfabetis sesuai format **APA (American Psychological Association)**:
+            Berikut adalah daftar pustaka artikel ilmiah utama yang melandasi metode SPAC sekuensial:
             
             1.  Aki, K. (1957). Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
             2.  Chimoto, K., Onishi, K., & Matsuoka, T. (2023). Simple SPAC processing method using zero-crossing analysis of 1-bit data processing for real-time monitoring of velocity change. *Exploration Geophysics*, 1–13. https://doi.org/10.1186/s40623-023-01842-3
