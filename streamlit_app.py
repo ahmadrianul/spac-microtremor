@@ -261,7 +261,280 @@ except Exception as e:
     st.stop()
 
 # --- Main Layout Tabs ---
-tab_input, tab_processing, tab_output = st.tabs(["Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi Final"])
+tab_teori, tab_input, tab_processing, tab_output = st.tabs(["Teori & Panduan", "Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi Final"])
+
+# ==========================================
+# TAB 0: TEORI & PANDUAN
+# ==========================================
+with tab_teori:
+    st.markdown("### Modul Teori & Panduan Metode SPAC Sekuensial")
+    st.write("Silakan pilih topik penjelasan ilmiah di bawah ini untuk mempelajari lebih lanjut tentang metode SPAC, formulasi matematis, desain akuisisi, alur pengolahan, jurnal pendukung, dan contoh studi kasus skripsi:")
+    
+    topik = st.selectbox(
+        "Pilih Topik Penjelasan:",
+        options=[
+            "1. Pengantar & Konsep Dasar SPAC",
+            "2. Formulasi Matematis & Rumus",
+            "3. Desain Akuisisi Data Sekuensial (Two-Station)",
+            "4. Alur Pengolahan Data (Step-by-Step)",
+            "5. Dukungan Artikel & Jurnal Ilmiah",
+            "6. Studi Kasus Skripsi (Desa Lonjoboko)"
+        ],
+        key="topik_teori"
+    )
+    
+    st.markdown("---")
+    
+    if topik == "1. Pengantar & Konsep Dasar SPAC":
+        st.markdown(r"""
+            #### 1. Pengantar & Konsep Dasar SPAC (Spatial Autocorrelation)
+            
+            Metode **Spatial Autocorrelation (SPAC)** merupakan salah satu metode geofisika pasif non-invasif yang sangat populer digunakan untuk mengestimasi struktur kecepatan gelombang geser ($V_s$) satu dimensi (1D) bawah permukaan.
+            
+            ##### A. Prinsip Dasar
+            Berbeda dengan metode seismik aktif tradisional (seperti MASW atau seismik refraksi) yang memerlukan sumber getaran buatan seperti palu godam (*sledgehammer*) atau peledak, metode SPAC memanfaatkan getaran alami bumi yang dikenal sebagai **ambient noise** atau **mikrotremor**. Getaran ini bersumber dari:
+            *   **Aktivitas Alam:** Gelombang laut, pergerakan angin, interaksi atmosfer, aktivitas tektonik mikro.
+            *   **Aktivitas Manusia:** Lalu lintas kendaraan, getaran mesin pabrik/industri, langkah kaki manusia, dan aktivitas perkotaan lainnya.
+            
+            Mikrotremor ini didominasi oleh gelombang permukaan (terutama **gelombang Rayleigh**) yang merambat secara horizontal di dekat permukaan bumi.
+            
+            ##### B. Keunggulan Metode SPAC
+            1.  **Non-Invasif & Non-Destruktif:** Tidak memerlukan pengeboran lubang bor (seperti pada metode SPT atau downhole/crosshole) yang mahal dan dapat merusak permukaan tanah, sehingga sangat ramah lingkungan.
+            2.  **Sangat Cocok untuk Kawasan Perkotaan (Urban Areas):** Di area padat penduduk, sangat sulit untuk membangkitkan getaran buatan berenergi besar (seperti dinamit atau palu). SPAC justru memanfaatkan kebisingan kota tersebut sebagai sumber sinyalnya.
+            3.  **Investigasi Lebih Dalam:** Karena memanfaatkan gelombang permukaan frekuensi rendah dari ambient noise global, SPAC mampu mencapai kedalaman investigasi yang jauh lebih besar (dari puluhan hingga ratusan meter) dibandingkan metode aktif berenergi rendah.
+            4.  **Ekonomis & Praktis:** Mengurangi biaya operasional lapangan dan mempermudah mobilisasi peralatan di area dengan topografi yang sulit.
+            
+            ##### C. Sejarah Singkat
+            Teori Spatial Autocorrelation pertama kali diformulasikan secara matematis oleh geofisikawan Jepang, **Keiiti Aki (1957)**. Beliau membuktikan secara matematis bahwa korelasi statistik dari getaran ambient noise yang direkam secara simultan pada beberapa stasiun penerima dapat digunakan untuk mengekstrak kurva dispersi gelombang permukaan. Teori ini kemudian dikembangkan dan disempurnakan menjadi metode praktis siap pakai untuk eksplorasi oleh **Hiroshi Okada (2003)** melalui bukunya yang terkenal, *"The Microtremor Survey Method"*.
+        """)
+        
+    elif topik == "2. Formulasi Matematis & Rumus":
+        st.markdown(r"""
+            #### 2. Formulasi Matematis & Rumus-Rumus
+            
+            Berikut adalah formulasi matematis utama yang melandasi perambatan gelombang seismik, karakter dispersi gelombang Rayleigh, hingga perhitungan koefisien SPAC untuk mengekstrak kecepatan fase gelombang permukaan:
+            
+            ##### A. Kecepatan Gelombang Seismik Badan (Body Waves)
+            Gelombang seismik badan merambat melalui interior bumi dan dibedakan menjadi Gelombang P (Primer/Longitudinal) dan Gelombang S (Sekunder/Transversal/Geser):
+        """)
+        
+        st.latex(r"V_p = \sqrt{\frac{k + \frac{4}{3}\mu}{\rho}}")
+        st.latex(r"V_s = \sqrt{\frac{\mu}{\rho}}")
+        
+        st.markdown(r"""
+            Dimana:
+            *   $V_p$ adalah kecepatan gelombang primer ($m/s$).
+            *   $V_s$ adalah kecepatan gelombang geser ($m/s$).
+            *   $k$ adalah Modulus Bulk medium ($N/m^2$).
+            *   $\mu$ adalah Modulus Geser / Konstanta Lame kedua ($N/m^2$).
+            *   $\rho$ adalah densitas massa medium ($kg/m^3$).
+            
+            ##### B. Kecepatan Gelombang Rayleigh ($V_R$)
+            Gelombang Rayleigh menjalar di sepanjang permukaan bebas bumi dengan lintasan partikel elips retrograde. Pada medium elastis homogen dan isotropis dengan rasio Poisson $\nu = 0.25$, hubungan antara kecepatan gelombang Rayleigh ($V_R$) dan gelombang geser ($V_S$) didekati dengan:
+        """)
+        
+        st.latex(r"V_R \approx 0.92 V_S")
+        
+        st.markdown(r"""
+            ##### C. Karakter Dispersi Geometris Gelombang Rayleigh
+            Gelombang Rayleigh bersifat dispersif pada medium berlapis, di mana komponen gelombang dengan frekuensi berbeda merambat dengan kecepatan fase yang berbeda karena kedalaman penetrasi yang berbeda. Kedalaman penetrasi efektif gelombang sebanding dengan panjang gelombangnya ($\lambda$). Secara matematis hubungan panjang gelombang, kecepatan fase ($c(f)$), dan frekuensi ($f$) dituliskan sebagai:
+        """)
+        
+        st.latex(r"\lambda = \frac{c(f)}{f}")
+        
+        st.markdown(r"""
+            *   **Frekuensi Tinggi (Panjang Gelombang Pendek):** Hanya merambat dan terkonsentrasi di lapisan dangkal yang lunak (kecepatan fase $c$ akan rendah).
+            *   **Frekuensi Rendah (Panjang Gelombang Panjang):** Mampu menembus lebih dalam dan dipengaruhi oleh lapisan batuan yang lebih kaku (kecepatan fase $c$ akan tinggi).
+            
+            ##### D. Transformasi Fourier
+            Untuk menganalisis frekuensi, data gelombang mentah dalam domain waktu-ruang $u(x, t)$ ditransformasikan ke domain frekuensi $U(x, \omega)$ melalui integral:
+        """)
+        
+        st.latex(r"U(x, \omega) = \int_{-\infty}^{\infty} u(x, t) e^{-j\omega t} dt")
+        
+        st.markdown(r"""
+            Dimana $\omega = 2\pi f$ adalah frekuensi sudut ($radian/detik$), $t$ adalah waktu ($detik$), dan $j$ adalah bilangan imajiner.
+            
+            ##### E. Fungsi Kompleks Koherensi ($C_{fg}(\omega)$)
+            Koherensi dihitung antar pasangan receiver $f$ and $g$ yang dipisahkan oleh jarak tertentu:
+        """)
+        
+        st.latex(r"C_{fg}(\omega) = \frac{CC_{fg}(\omega)}{|U_f(\omega)| \cdot |U_g(\omega)|}")
+        
+        st.markdown(r"""
+            Di mana $CC_{fg}(\omega) = U_f(\omega) \cdot U_g^*(\omega)$ adalah korelasi silang (*cross-spectral density*) antara spektrum frekuensi tras pertama $U_f(\omega)$ dan konjugat kompleks spektrum tras kedua $U_g^*(\omega)$.
+            
+            ##### F. Koefisien SPAC Rata-rata Azimuthal ($\rho(f, r)$)
+            Koefisien SPAC diperoleh dengan merata-ratakan nilai koherensi spasial $C(r, \theta, \omega)$ dari segala arah (azimuth $\theta$ dari $0$ hingga $2\pi$):
+        """)
+        
+        st.latex(r"\rho(f, r) = \frac{1}{2\pi} \int_{0}^{2\pi} C(r, \theta, \omega) d\theta")
+        
+        st.markdown(r"""
+            ##### G. Pencocokan ke Fungsi Bessel Jenis Pertama Orde Nol ($J_0$)
+            Aki (1957) membuktikan bahwa jika medan gelombang mikrotremor datang secara acak dari segala arah dengan kekuatan seimbang, koefisien SPAC azimuthal rata-rata memiliki hubungan matematis langsung dengan Fungsi Bessel $J_0$:
+        """)
+        
+        st.latex(r"\rho(f, r) = J_0(kr) = J_0\left(\frac{2\pi f r}{c(f)}\right)")
+        
+        st.markdown(r"""
+            Dimana $r$ adalah jarak radius antar sensor ($meter$) dan $c(f)$ adalah kecepatan fase gelombang Rayleigh ($m/s$).
+            
+            ##### H. Estimasi Kecepatan Fase ($c(f)$)
+            Dari nilai koefisien SPAC observasi lapangan $\rho(f, r)$ pada setiap frekuensi $f$, kita menyelesaikan persamaan transenden di atas untuk mencari argumen Bessel $x = kr$ (yaitu $x = \frac{2\pi f r}{c(f)}$) menggunakan metode numerik. Setelah nilai $x$ diperoleh, kecepatan fase gelombang Rayleigh dapat diekstrak dengan rumus:
+        """)
+        
+        st.latex(r"c(f) = \frac{2\pi f r}{x}")
+        
+    elif topik == "3. Desain Akuisisi Data Sekuensial (Two-Station)":
+        st.markdown(r"""
+            #### 3. Desain Akuisisi Data Sekuensial (Two-Station Method)
+            
+            Secara konvensional, survei SPAC memerlukan susunan sensor (*array*) melingkar atau segitiga sama sisi yang merekam secara simultan (minimal menggunakan 4 geofon: 1 pusat, 3 keliling). Namun, konfigurasi tersebut membutuhkan banyak peralatan geofon dan kabel bentangan yang rumit.
+            
+            ##### A. Konsep Metode Dua Sensor (Two-Station Method)
+            Untuk meningkatkan efisiensi di lapangan, metode **SPAC Sekuensial (Two-Station Method)** dapat diterapkan hanya dengan menggunakan **2 buah geofon** (seperti unit sensor SmartSolo 3C).
+            
+            Sinyal direkam secara bertahap (sekuensial) dengan konfigurasi geometri segitiga sama sisi sebagai berikut:
+            1.  **Geofon Referensi Tetap (Pusat A):** Diletakkan tetap di titik pusat koordinat selama seluruh sesi pengukuran.
+            2.  **Geofon Bergerak (Rover B):** Dipindahkan secara berurutan ke stasiun keliling lingkaran pada radius $r$ yang sama, yaitu di titik **B1**, **B2**, dan **B3** (membentuk sudut pisah $120^\circ$ satu sama lain).
+            
+            Perekaman dilakukan selama durasi tertentu pada masing-masing dari 3 stasiun pasangan (A-B1 pada Sesi 1, A-B2 pada Sesi 2, dan A-B3 pada Sesi 3).
+        """)
+        
+        # Render larger SVG array geometry illustration
+        st.markdown("""
+            <div style="display: flex; justify-content: center; margin-top: 1rem; margin-bottom: 1rem; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
+                <svg width="220" height="190" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Triangle Lines -->
+                    <line x1="100" y1="15" x2="35" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+                    <line x1="100" y1="15" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+                    <line x1="35" y1="128" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+                    <!-- Radius lines (dashed) -->
+                    <line x1="100" y1="90" x2="100" y2="15" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                    <line x1="100" y1="90" x2="35" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                    <line x1="100" y1="90" x2="165" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                    <!-- Center Node A -->
+                    <circle cx="100" cy="90" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
+                    <text x="100" y="93.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
+                    <!-- Top Vertex B1 -->
+                    <circle cx="100" cy="15" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                    <text x="100" y="18.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
+                    <!-- Bottom-Left Vertex B3 -->
+                    <circle cx="35" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                    <text x="35" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
+                    <!-- Bottom-Right Vertex B2 -->
+                    <circle cx="165" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                    <text x="165" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
+                    <!-- Radius Text -->
+                    <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r) = 4.62 m</text>
+                </svg>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown(r"""
+            ##### B. Parameter Akuisisi Data Lapangan (Studi Kasus)
+            *   **Radius Array ($r$):** $4.62$ meter (jarak konstan dari pusat A ke stasiun lingkaran B1, B2, B3).
+            *   **Sisi Segitiga Keliling ($B_1-B_2-B_3$):** $8.0$ meter.
+            *   **Durasi Perekaman:** minimal 20 menit untuk masing-masing stasiun pasangan (total ~60 menit perekaman).
+            *   **Sampling Rate:** 100 Hz.
+            *   **Sensor Geofon:** Geofon SmartSolo IGU-16HR 3C 2Hz (diambil komponen vertikal).
+            
+            ##### C. Asumsi Kunci
+            Metode ini sangat bergantung pada asumsi bahwa **medan getaran ambient noise bersifat stasioner** (karakteristik statistiknya stabil dan tidak berubah) sepanjang total durasi perekaman ketiga sesi tersebut. Rata-rata azimuthal disimulasikan secara numerik saat pemrosesan data dengan merata-ratakan hasil koherensi silang dari ketiga stasiun pasangan yang direkam secara terpisah tersebut.
+        """)
+        
+    elif topik == "4. Alur Pengolahan Data (Step-by-Step)":
+        st.markdown(r"""
+            #### 4. Alur Pengolahan Data (Step-by-Step)
+            
+            Proses pengolahan data mikrotremor metode SPAC sekuensial dari berkas mentah hingga menjadi kurva dispersi final dilakukan melalui tahapan berikut:
+            
+            1.  **Input Data Seismogram:**
+                Membaca file rekaman biner seismik berformat **SAC** atau **MINISEED** untuk stasiun referensi (A) dan stasiun keliling (B) untuk masing-masing sesi (Pair 1, Pair 2, Pair 3).
+            2.  **Segmentasi Waktu (Windowing):**
+                Sinyal kontinu berdurasi panjang disegmentasi menjadi sejumlah jendela waktu yang lebih pendek (misalnya panjang jendela sebesar $2^{13} = 8192$ sampel atau setara 81.92 detik pada sampling rate 100 Hz) dengan *overlap* tertentu. Hal ini berguna untuk mengisolasi segmen data yang stasioner dan membuang gangguan transient noise lokal (seperti getaran akibat kendaraan yang lewat sangat dekat).
+            3.  **Transformasi Spektral (FFT):**
+                Setiap jendela waktu dari data domain waktu ditransformasikan ke domain frekuensi menggunakan algoritma Fast Fourier Transform (FFT) guna mendapatkan spektrum amplitudo dan fase sinyal.
+            4.  **Kalkulasi Kompleks Koherensi:**
+                Kompleks koherensi dihitung pada setiap frekuensi untuk setiap jendela waktu pada masing-masing sesi stasiun pasangan (A-B1, A-B2, A-B3).
+            5.  **Quality Control (QC) & Seleksi Jendela Otomatis:**
+                *   **Evaluasi RMSE:** Aplikasi menghitung selisih (Root Mean Square Error / RMSE) antara nilai koherensi setiap jendela terhadap nilai median koherensi pada rentang frekuensi kontrol (1 - 50 Hz).
+                *   **Saran Window:** Jendela dengan RMSE di bawah batas cutoff (misalnya median + 0.05 standar deviasi) diklasifikasikan sebagai **jendela bersih (konsisten)**, sedangkan jendela dengan RMSE tinggi diklasifikasikan sebagai **outlier (noise)** dan disarankan untuk dibuang.
+            6.  **Rata-rata Dua Tahap (Two-Stage Stacking):**
+                *   *Tahap 1:* Jendela-jendela yang terpilih di dalam masing-masing sesi dirata-ratakan secara independen untuk mendapatkan kurva koefisien SPAC Sesi 1 ($\rho_1$), Sesi 2 ($\rho_2$), dan Sesi 3 ($\rho_3$).
+                *   *Tahap 2:* Ketiga kurva rata-rata sesi tersebut kemudian dirata-ratakan secara bersama-sama untuk mendapatkan kurva koefisien SPAC akhir ($\rho_{avg}$). Hal ini penting untuk menjamin pembobotan spasial yang seimbang dari segala arah sensor.
+            7.  **Pencocokan Fungsi Bessel (Bessel Fitting):**
+                Nilai koefisien SPAC rata-rata akhir $\rho_{avg}(f)$ dicocokkan dengan kurva Bessel teoritis $J_0(x)$ menggunakan metode kuadrat terkecil (*least-squares fitting*) untuk memperoleh nilai argumen Bessel $x = kr$ pada setiap frekuensi.
+            8.  **Ekstraksi Kurva Dispersi:**
+                Kecepatan fase Rayleigh dihitung menggunakan rumus $c(f) = \frac{2\pi f r}{x}$. Hasilnya kemudian disaring dalam batasan kecepatan fase minimum dan maksimum, serta dapat dipotong (*frequency cut*) pada rentang frekuensi yang bersih dari noise.
+        """)
+        
+    elif topik == "5. Dukungan Artikel & Jurnal Ilmiah":
+        st.markdown(r"""
+            #### 5. Dukungan Artikel & Jurnal Ilmiah
+            
+            Untuk memperkuat validasi akademis dan memberikan referensi bagi pengguna, berikut adalah daftar pustaka dan ringkasan makalah ilmiah utama yang melandasi metode SPAC sekuensial:
+            
+            1.  **Aki, K. (1957).** *Space and time spectra of stationary stochastic waves, with special reference to microtremors.* Bulletin of the Earthquake Research Institute, 35, 415–456.
+                *   **Kontribusi:** Makalah fundamental yang pertama kali merumuskan dasar teori korelasi spasial (SPAC) untuk menganalisis medan gelombang stokastik stasioner dari mikrotremor.
+            2.  **Okada, H. (2003).** *The Microtremor Survey Method.* Society of Exploration Geophysicists (Translated by K. Suto).
+                *   **Kontribusi:** Buku referensi utama yang memaparkan teori, akuisisi, dan pemrosesan data mikrotremor (SPAC dan ESPAC) untuk rekayasa geoteknik dan seismologi teknik.
+            3.  **Cho, I. (2020).** *Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components.* Geophysical Journal International, 220, 1735–1747.
+                *   **Kontribusi:** Meneliti formulasi teoritis metode SPAC menggunakan hanya dua sensor (two-sensor SPAC) dan menganalisis peran komponen spektrum imajiner untuk mendeteksi ketidakstabilan arah datang gelombang.
+            4.  **Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022).** *Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data.* Journal of Seismology, 26, 601–627.
+                *   **Kontribusi:** Panduan komprehensif dari komite internasional mengenai praktik terbaik (*good practices*) untuk akuisisi lapangan dan pengolahan data menggunakan analisis SPAC.
+            5.  **Chimoto, K., Onishi, K., & Matsuoka, T. (2023).** *Simple SPAC processing method using zero-crossing analysis of 1-bit data processing for real-time monitoring of velocity change.* Exploration Geophysics, 1–13.
+                *   **Kontribusi:** Menyajikan alternatif pemrosesan data SPAC berbasis analisis lintasan-nol (*zero-crossing*) dengan pemrosesan data 1-bit untuk pemantauan perubahan kecepatan secara real-time.
+        """)
+        
+    elif topik == "6. Studi Kasus Skripsi (Desa Lonjoboko)":
+        st.markdown(r"""
+            #### 6. Studi Kasus Skripsi & Klasifikasi Kelas Situs
+            
+            Aplikasi web ini dapat digunakan untuk mendukung penelitian geoteknik dan mikrozonasi gempa, seperti studi kasus tugas akhir/skripsi berikut:
+            
+            ##### A. Identitas Penelitian
+            *   **Penulis:** Ahmad Rianul Qauliah (NIM: H061 20 1012)
+            *   **Judul Skripsi:** *Karakterisasi Profil Kecepatan Gelombang Geser Menggunakan Metode SPAC (Spatial Autocorrelation): Studi Kasus Desa Lonjoboko, Gowa*
+            *   **Institusi:** Program Studi Geofisika, Departemen Geofisika, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Hasanuddin, Makassar, 2026.
+            *   **Pembimbing Utama:** Dr. Erfan, M.Si.
+            
+            ##### B. Klasifikasi Kelas Situs ($V_{s30}$)
+            Berdasarkan standar **SNI 1726:2019**, penentuan kelas situs dihitung berdasarkan nilai rata-rata kecepatan gelombang geser hingga kedalaman 30 meter ($V_{s30}$). Persamaan rata-rata harmonik kecepatan tersebut dirumuskan sebagai:
+        """)
+        
+        st.latex(r"V_{s30} = \frac{\sum_{i=1}^{n} d_i}{\sum_{i=1}^{n} \frac{d_i}{V_{si}}}")
+        
+        st.markdown(r"""
+            Dimana:
+            *   $V_{s30}$ adalah kecepatan gelombang geser rata-rata hingga kedalaman 30 meter ($m/s$).
+            *   $d_i$ adalah ketebalan lapisan ke-$i$ ($meter$).
+            *   $V_{si}$ adalah kecepatan gelombang geser lapisan ke-$i$ ($m/s$).
+            *   $\sum_{i=1}^{n} d_i$ adalah kedalaman total yaitu 30 meter.
+            
+            ##### C. Tabel Klasifikasi Situs (SNI 1726:2019)
+            
+            | Kelas Situs | Nama Situs | Kecepatan Gelombang Geser Rata-rata ($V_{s30}$, m/s) |
+            | :---: | :--- | :---: |
+            | **SA** | Batuan Keras | $> 1500$ |
+            | **SB** | Batuan | $750$ sampai $1500$ |
+            | **SC** | Tanah Keras, Sangat Padat, dan Batuan Lunak | $350$ sampai $750$ |
+            | **SD** | Tanah Sedang (Medium) | $175$ sampai $350$ |
+            | **SE** | Tanah Lunak | $< 175$ |
+            | **SF** | Tanah Khusus | Memerlukan investigasi geoteknik spesifik |
+            
+            ##### D. Hasil Pemodelan Desa Lonjoboko, Gowa
+            Berdasarkan hasil inversi kurva dispersi dengan algoritma Monte Carlo, struktur bawah permukaan daerah rawan longsor di Desa Lonjoboko dimodelkan atas 5 lapisan:
+            
+            1.  **Lapisan 1 (0.00 – 4.76 m):** Lempung Berpasir ($V_s = 290.69$ m/s, tebal $4.76$ m) $\rightarrow$ *Tanah Sedang (SD)*
+            2.  **Lapisan 2 (4.76 – 15.17 m):** Pasir Sedang / Medium Stiff Soil ($V_s = 298.40$ m/s, tebal $10.41$ m) $\rightarrow$ *Tanah Sedang (SD)*
+            3.  **Lapisan 3 (15.17 – 29.16 m):** Pasir Padat / Stiff Soil ($V_s = 315.14$ m/s, tebal $13.99$ m) $\rightarrow$ *Tanah Sedang (SD)*
+            4.  **Lapisan 4 (29.16 – 56.20 m):** Batupasir / Very Dense Soil ($V_s = 1075.28$ m/s, tebal $27.04$ m) $\rightarrow$ *Batuan (SC)*
+            5.  **Lapisan 5 (> 56.20 m):** Tufa / Rock ($V_s = 1174.28$ m/s, *half-space*) $\rightarrow$ *Batuan (SC)*
+            
+            Rata-rata kecepatan gelombang geser hingga kedalaman 30 meter ($V_{s30}$) diperoleh sebesar **$302.47$ m/s**. Berdasarkan standar SNI 1726:2019, lokasi penelitian diklasifikasikan sebagai kelas situs **Tanah Sedang (SD)**.
+        """)
 
 # ==========================================
 # TAB 1: INPUT DATA
