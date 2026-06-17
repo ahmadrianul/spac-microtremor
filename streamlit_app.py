@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 plt.show = lambda *args, **kwargs: None
 import matplotlib.colors as mcolors
 from scipy.special import jv
+from scipy.optimize import least_squares
 import uuid
 
 # Import spacunhas modules from the local folder
