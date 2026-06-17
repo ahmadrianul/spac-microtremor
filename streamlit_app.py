@@ -252,7 +252,7 @@ except Exception as e:
     st.stop()
 
 # --- Main Layout Tabs ---
-tab_teori, tab_input, tab_processing, tab_output = st.tabs(["Teori & Panduan", "Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi Final"])
+tab_teori, tab_input, tab_processing, tab_output, tab_inversion = st.tabs(["Teori & Panduan", "Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi Final", "Inversi Vs 1D"])
 
 # ==========================================
 # TAB 0: TEORI & PANDUAN
@@ -860,6 +860,11 @@ with tab_output:
                 bessel_fit_cut = bessel_fit[mask_cut]
                 avspac_dec_cut = avspac_dec[mask_cut]
 
+                # Save to session state for Inversion tab
+                st.session_state.f_pv_cut = f_pv_cut
+                st.session_state.pv_cut = pv_cut
+                st.session_state.active_radius = radius
+
                 # --- Visualizations ---
                 col_c1, col_c2 = st.columns(2)
                 
@@ -1051,3 +1056,251 @@ with tab_output:
                 
             except Exception as ex_fit:
                 st.error(f"Gagal melakukan least-squares fitting: {ex_fit}")
+
+# ==========================================
+# TAB 5: INVERSI VS 1D
+# ==========================================
+with tab_inversion:
+    st.subheader("4. Inversi Linier Terbobot (1D Vs Profile Inversion)")
+    
+    if "f_pv_cut" not in st.session_state or len(st.session_state.f_pv_cut) == 0:
+        st.warning("Silakan selesaikan pemotongan rentang frekuensi kurva dispersi di tab 'Kurva Dispersi Final' terlebih dahulu.")
+    else:
+        # Load active data
+        f_obs = st.session_state.f_pv_cut
+        c_obs = st.session_state.pv_cut
+        active_r = st.session_state.get("active_radius", 4.62)
+        
+        # Calculate wavelengths
+        wavelengths = c_obs / f_obs
+        max_wl = float(np.max(wavelengths))
+        min_wl = float(np.min(wavelengths))
+        
+        # Suggested Parameters
+        suggested_max_depth = max_wl * 0.5
+        suggested_min_depth = min_wl * 0.4
+        
+        st.markdown("### Konfigurasi Parameter Inversi")
+        st.write("Parameter di bawah ini diisi otomatis sebagai saran berdasarkan karakteristik panjang gelombang data Anda:")
+        
+        # Layout columns for parameters
+        col_p1, col_p2 = st.columns(2)
+        
+        with col_p1:
+            st.markdown("#### Parameter Konversi Empiris")
+            coeff_depth = st.number_input("Koefisien Kedalaman (a)", min_value=0.1, max_value=1.0, value=0.4, step=0.05, 
+                                          help="Kedalaman diestimasi dengan z = a * lambda. Default 0.4")
+            coeff_vel = st.number_input("Koefisien Kecepatan Vs (b)", min_value=0.5, max_value=2.0, value=1.1, step=0.05,
+                                        help="Vs diestimasi dengan Vs = b * c. Default 1.1")
+            
+            st.markdown("#### Parameter Bobot Sinyal (Inversi)")
+            m_weight = st.number_input("Eksponen Pembobotan Kedalaman (m)", min_value=0.5, max_value=5.0, value=1.5, step=0.1,
+                                       help="Mempengaruhi seberapa cepat kepekaan Rayleigh wave memudar terhadap kedalaman. Default 1.5")
+            alpha_damping = st.number_input("Faktor Redaman / Damping (alpha)", min_value=0.0, max_value=10.0, value=0.1, step=0.01,
+                                            help="Mengontrol kemulusan perlapisan Vs. Semakin besar nilai, profil semakin mulus/seragam.")
+            
+        with col_p2:
+            st.markdown("#### Konfigurasi Perlapisan (Layering)")
+            num_layers = st.slider("Jumlah Lapisan (N)", min_value=2, max_value=8, value=4, step=1)
+            
+            st.markdown("**Batas Kedalaman Bawah Lapisan (m):**")
+            # Automatically suggest depths based on suggested_max_depth
+            depth_boundaries = [0.0]
+            depths_ok = True
+            for i in range(1, num_layers):
+                # Suggested boundary spacing: linear intervals up to suggested_max_depth
+                suggested_val = float(np.round(suggested_max_depth * (i / num_layers), 1))
+                val = st.number_input(f"Batas Bawah Lapisan {i} (meter)", min_value=0.1, value=suggested_val, step=0.5, key=f"d_bound_{i}")
+                if i > 1 and val <= depth_boundaries[-1]:
+                    st.error(f"Error: Batas bawah Lapisan {i} harus lebih besar dari Lapisan {i-1} ({depth_boundaries[-1]} m).")
+                    depths_ok = False
+                depth_boundaries.append(val)
+            
+        if depths_ok:
+            # Prepare depths array
+            d_bounds = np.array(depth_boundaries)
+            
+            # Inversion computation
+            M_data = len(f_obs)
+            W_mat = np.zeros((M_data, num_layers))
+            for i in range(M_data):
+                wl = wavelengths[i]
+                for k in range(num_layers):
+                    d_start = d_bounds[k]
+                    d_end = d_bounds[k+1] if k < num_layers-1 else np.inf
+                    W_mat[i, k] = np.exp(-m_weight * d_start / wl) - (np.exp(-m_weight * d_end / wl) if k < num_layers-1 else 0.0)
+            
+            # Residual function
+            def residuals_inv(Vs_params, W, c_data, alpha):
+                res_fit = np.dot(W, Vs_params) - c_data
+                res_smooth = np.zeros(len(Vs_params) - 1)
+                for i in range(len(Vs_params) - 1):
+                    res_smooth[i] = np.sqrt(alpha) * (Vs_params[i+1] - Vs_params[i])
+                return np.concatenate([res_fit, res_smooth])
+                
+            # Initial guess (average of empirical Vs)
+            emp_vs_vals = coeff_vel * c_obs
+            emp_z_vals = coeff_depth * wavelengths
+            vs0_guess = np.ones(num_layers) * np.mean(emp_vs_vals)
+            
+            with st.spinner("Sedang melakukan inversi least-squares..."):
+                try:
+                    # Inversion using bounded least squares
+                    res_opt = least_squares(residuals_inv, vs0_guess, args=(W_mat, c_obs, alpha_damping), bounds=(50.0, 2000.0))
+                    Vs_inverted = res_opt.x
+                    c_calc = np.dot(W_mat, Vs_inverted)
+                    
+                    st.success("Inversi berhasil diselesaikan!")
+                    
+                    # --- Plotting Results ---
+                    col_plot1, col_plot2 = st.columns(2)
+                    
+                    with col_plot1:
+                        st.markdown("#### 1D Shear-Wave Velocity (Vs) Profile")
+                        
+                        # Construct step function for Vs profile
+                        plot_z = []
+                        plot_vs = []
+                        max_plot_depth = float(np.max(emp_z_vals)) * 1.2 if len(emp_z_vals) > 0 else 50.0
+                        
+                        for k in range(num_layers):
+                            z_top = d_bounds[k]
+                            z_bottom = d_bounds[k+1] if k < num_layers-1 else max_plot_depth
+                            plot_z.extend([z_top, z_bottom])
+                            plot_vs.extend([Vs_inverted[k], Vs_inverted[k]])
+                            
+                        fig_vs = go.Figure()
+                        
+                        # Inverted Layered Profile (Step Line)
+                        fig_vs.add_trace(go.Scatter(
+                            x=plot_vs,
+                            y=plot_z,
+                            mode='lines',
+                            name='Vs Terinversi (Layered)',
+                            line=dict(color='red', width=3)
+                        ))
+                        
+                        # Empirical scatter points
+                        fig_vs.add_trace(go.Scatter(
+                            x=emp_vs_vals,
+                            y=emp_z_vals,
+                            mode='markers',
+                            name='Estimasi Empiris (Scatter)',
+                            marker=dict(color='blue', size=6, symbol='circle')
+                        ))
+                        
+                        fig_vs.update_layout(
+                            title=dict(text="Profil Vs 1D terhadap Kedalaman", font=dict(color="black")),
+                            xaxis=dict(
+                                title=dict(text="Kecepatan Gelombang Geser Vs (m/s)", font=dict(color="black")),
+                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
+                            ),
+                            yaxis=dict(
+                                title=dict(text="Kedalaman z (m)", font=dict(color="black")),
+                                autorange="reverse",  # Depth points downwards
+                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
+                            ),
+                            template="plotly_white",
+                            height=450,
+                            plot_bgcolor="white",
+                            paper_bgcolor="white",
+                            legend=dict(font=dict(color="black"))
+                        )
+                        st.plotly_chart(fig_vs, use_container_width=True)
+                        
+                    with col_plot2:
+                        st.markdown("#### Pencocokan Kurva Dispersi (Goodness of Fit)")
+                        
+                        fig_fit = go.Figure()
+                        
+                        # Observed
+                        fig_fit.add_trace(go.Scatter(
+                            x=f_obs,
+                            y=c_obs,
+                            mode='markers+lines',
+                            name='Observed (Hasil Fitting SPAC)',
+                            line=dict(color='black', width=1),
+                            marker=dict(color='black', size=6)
+                        ))
+                        
+                        # Calculated
+                        fig_fit.add_trace(go.Scatter(
+                            x=f_obs,
+                            y=c_calc,
+                            mode='lines',
+                            name='Calculated (Dari Model Vs)',
+                            line=dict(color='blue', width=2.5, dash='dash')
+                        ))
+                        
+                        # Dynamic limits
+                        y_min_fit = float(min(np.min(c_obs), np.min(c_calc)))
+                        y_max_fit = float(max(np.max(c_obs), np.max(c_calc)))
+                        y_pad_fit = (y_max_fit - y_min_fit) * 0.05 if y_max_fit > y_min_fit else 50.0
+                        
+                        fig_fit.update_layout(
+                            title=dict(text="Perbandingan Kurva Dispersi Observasi vs Kalkulasi", font=dict(color="black")),
+                            xaxis=dict(
+                                title=dict(text="Frekuensi (Hz)", font=dict(color="black")),
+                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
+                            ),
+                            yaxis=dict(
+                                title=dict(text="Kecepatan Fase (m/s)", font=dict(color="black")),
+                                range=[y_min_fit - y_pad_fit, y_max_fit + y_pad_fit],
+                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
+                            ),
+                            template="plotly_white",
+                            height=450,
+                            plot_bgcolor="white",
+                            paper_bgcolor="white",
+                            legend=dict(font=dict(color="black"))
+                        )
+                        st.plotly_chart(fig_fit, use_container_width=True)
+                        
+                    # --- Table and Download Inversion Results ---
+                    st.markdown("---")
+                    st.markdown("### Hasil Perlapisan Vs Terinversi")
+                    
+                    # Construct results table
+                    layers_list = []
+                    for k in range(num_layers):
+                        z_top = d_bounds[k]
+                        z_bottom = d_bounds[k+1] if k < num_layers-1 else np.inf
+                        thick = z_bottom - z_top if k < num_layers-1 else np.nan
+                        vs_val = Vs_inverted[k]
+                        
+                        # Get soil class label
+                        if vs_val > 1500:
+                            s_class = "SA (Batuan Keras)"
+                        elif vs_val > 750:
+                            s_class = "SB (Batuan)"
+                        elif vs_val > 350:
+                            s_class = "SC (Tanah Keras / Batuan Lunak)"
+                        elif vs_val > 175:
+                            s_class = "SD (Tanah Sedang)"
+                        else:
+                            s_class = "SE (Tanah Lunak)"
+                            
+                        layers_list.append({
+                            "Lapisan": k + 1,
+                            "Kedalaman Atas (m)": z_top,
+                            "Kedalaman Bawah (m)": z_bottom if k < num_layers-1 else "Infinity",
+                            "Ketebalan (m)": thick if k < num_layers-1 else "Infinity",
+                            "Kecepatan Vs (m/s)": np.round(vs_val, 1),
+                            "Kelas Situs Tanah (FEMA/SNI)": s_class
+                        })
+                        
+                    df_res = pd.DataFrame(layers_list)
+                    st.dataframe(df_res, use_container_width=True)
+                    
+                    # CSV Download
+                    csv_res = df_res.to_csv(index=False)
+                    st.download_button(
+                        label="Unduh Profil Vs Terinversi (CSV)",
+                        data=csv_res,
+                        file_name=f"vs_profile_inversion_layers_{num_layers}.csv",
+                        mime="text/csv",
+                        key="btn_download_vs"
+                    )
+                    
+                except Exception as ex_inv:
+                    st.error(f"Gagal melakukan proses inversi: {ex_inv}")
