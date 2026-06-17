@@ -570,7 +570,7 @@ with tab_processing:
     st.subheader("2. Pemrosesan Data & Stacking Window (Quality Control)")
     
     if len(st.session_state.data_list_by_pair) == 0:
-        st.warning("Silakan unggah data Anda atau muat Data Demo di tab pertama sebelum memproses.")
+        st.warning("Silakan unggah data Anda atau muat Data Demo di tab Input Data sebelum memproses.")
     else:
         # Run process button
         btn_run = st.button("Mulai Proses Windowing & Koherensi", type="primary")
@@ -825,7 +825,7 @@ with tab_output:
     st.subheader("3. Kurva Dispersi Final (Pencocokan Fungsi Bessel J0)")
     
     if "spaccoeff_obj" not in st.session_state:
-        st.warning("Silakan selesaikan pemrosesan dan Quality Control di tab kedua terlebih dahulu.")
+        st.warning("Silakan selesaikan pemrosesan dan Quality Control di tab QC Data terlebih dahulu.")
     else:
         st.info(f"Menghitung kurva dispersi dengan batas kecepatan fase: {min_pv} m/s hingga {max_pv} m/s.")
         
