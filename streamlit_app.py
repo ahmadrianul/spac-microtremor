@@ -583,7 +583,7 @@ with tab_input:
     
     # Demo Data Option
     st.write("**Belum punya data lapangan?** Gunakan data demo mikrotremor kami untuk mencoba:")
-    demo_btn = st.button("Gunakan Data Demo (Site Hasanuddin University)")
+    demo_btn = st.button("Gunakan Data Demo (Site Lonjoboko, Gowa")
     
     if demo_btn:
         # We will copy demo data from local demo_data folder in the repo
