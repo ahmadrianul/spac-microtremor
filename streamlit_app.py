@@ -547,10 +547,9 @@ with tab_teori:
             Berikut adalah daftar pustaka artikel ilmiah utama yang melandasi metode SPAC sekuensial:
             
             1.  Aki, K. (1957). Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
-            2.  Chimoto, K., Onishi, K., & Matsuoka, T. (2023). Simple SPAC processing method using zero-crossing analysis of 1-bit data processing for real-time monitoring of velocity change. *Exploration Geophysics*, 1–13. https://doi.org/10.1186/s40623-023-01842-3
-            3.  Cho, I. (2020). Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747. https://doi.org/10.1093/gji/ggz454
-            4.  Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022). Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627. https://doi.org/10.1007/s10712-018-9474-2
-            5.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
+            2.  Cho, I. (2020). Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747.
+            3.  Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022). Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627.
+            4.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
         """)
 
 # ==========================================
