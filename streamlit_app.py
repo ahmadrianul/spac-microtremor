@@ -1108,10 +1108,18 @@ with tab_inversion:
             # Automatically suggest depths based on suggested_max_depth
             depth_boundaries = [0.0]
             depths_ok = True
+            # We use a key hash of wavelengths and number of layers to force reset when data or layering changes
+            data_hash = f"{min_wl:.2f}_{max_wl:.2f}"
             for i in range(1, num_layers):
                 # Suggested boundary spacing: linear intervals up to suggested_max_depth
                 suggested_val = float(np.round(suggested_max_depth * (i / num_layers), 1))
-                val = st.number_input(f"Batas Bawah Lapisan {i} (meter)", min_value=0.1, value=suggested_val, step=0.5, key=f"d_bound_{i}")
+                val = st.number_input(
+                    f"Batas Bawah Lapisan {i} (meter)", 
+                    min_value=0.1, 
+                    value=suggested_val, 
+                    step=0.5, 
+                    key=f"d_bound_{i}_{num_layers}_{data_hash}"
+                )
                 if i > 1 and val <= depth_boundaries[-1]:
                     st.error(f"Error: Batas bawah Lapisan {i} harus lebih besar dari Lapisan {i-1} ({depth_boundaries[-1]} m).")
                     depths_ok = False
