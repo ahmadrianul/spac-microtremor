@@ -18,6 +18,86 @@ import uuid
 from spacunhas import environment, readdata, windowing, complexcoherence, spaccoefficient, dispersioncurve
 import math
 
+
+# =============================================================================
+# MONTE CARLO FORWARD ENGINE FUNCTIONS
+# =============================================================================
+def _rs_t_vec(c, vp, vs):
+    vp = np.maximum(vp, 1.0)
+    vs = np.maximum(vs, 1.0)
+    r = np.sqrt(1.0 - (c / vp) ** 2 + 0j)
+    s = np.sqrt(1.0 - (c / vs) ** 2 + 0j)
+    t = 2.0 - (c / vs) ** 2
+    return r, s, t
+
+def _CS_vec(x, Cm=80.0):
+    C = np.cosh(x)
+    S = np.sinh(x)
+    real_x = np.real(x)
+    mask = np.abs(real_x) > Cm
+    if np.any(mask):
+        fac = np.exp(real_x[mask])
+        C[mask] /= fac
+        S[mask] /= fac
+    return C, S
+
+def D_fast_delta_vec(c_arr, k_arr, h, vp, vs, rho):
+    n = len(h)
+    size = len(c_arr)
+    x1 = np.zeros(size, dtype=complex); x2 = np.zeros(size, dtype=complex)
+    x3 = np.zeros(size, dtype=complex); x4 = np.zeros(size, dtype=complex)
+    x5 = np.zeros(size, dtype=complex); x6 = np.ones(size, dtype=complex)
+
+    for i in range(n):
+        r, s, t = _rs_t_vec(c_arr, vp[i], vs[i])
+        arg_p = k_arr * r * h[i]
+        arg_s = k_arr * s * h[i]
+        Cp, Sp = _CS_vec(arg_p)
+        Cs, Ss = _CS_vec(arg_s)
+
+        p1 = Cp*x1 + Ss*x4; p2 = Cp*x2 + Ss*x5
+        p3 = -Sp*x1 + Cp*x3; p4 = -Sp*x2 + Cp*x6
+        q2 = Cs*p2 - (r/s)*Ss*p4; q3 = Cs*p3 - (r/s)*Ss*p1; q4 = -Ss*p2 + Cs*p4
+
+        mu_i = rho[i]*(vs[i]**2)
+        mu_ip1 = rho[i+1]*(vs[i+1]**2)
+        y = mu_ip1/mu_i; q = (vs[i+1]/vs[i])**2
+        a = 1.0-q; ap = 1.0-1.0/q; b = 1.0-y; bp = 1.0-1.0/y
+
+        x1 = a*q2 + b*p1; x2 = a*q3 + b*p2; x3 = ap*q4 + bp*p3
+        x4 = a*p1 + b*q2; x5 = a*p2 + b*q3; x6 = ap*p3 + bp*q4
+
+    rL, sL, tL = _rs_t_vec(c_arr, vp[-1], vs[-1])
+    D = 2.0*sL*x2 - (rL*(tL**2)*sL)*x1
+    return D
+
+def calc_curve_fast_optimized(freq_hz, h, vp, vs, rho, c_obs):
+    c_out = np.full_like(freq_hz, np.nan, dtype=float)
+    c_min_scan = max(100.0, np.min(c_obs) * 0.6)
+    c_max_scan = np.max(c_obs) * 1.6
+    c_scan = np.linspace(c_min_scan, c_max_scan, 500) 
+    
+    for ii, f in enumerate(freq_hz):
+        k_scan = 2.0 * np.pi * f / c_scan
+        D_vals = np.real(D_fast_delta_vec(c_scan, k_scan, h, vp, vs, rho))
+        signs = np.sign(D_vals)
+        crossings = np.where(signs[:-1] * signs[1:] < 0)[0]
+        
+        if len(crossings) > 0:
+            idx = crossings[0]
+            c1, c2 = c_scan[idx], c_scan[idx+1]
+            val_1 = np.real(D_fast_delta_vec(np.array([c1]), np.array([2.0*np.pi*f/c1]), h, vp, vs, rho))[0]
+            for _ in range(10): 
+                cm = 0.5 * (c1 + c2)
+                val_m = np.real(D_fast_delta_vec(np.array([cm]), np.array([2.0*np.pi*f/cm]), h, vp, vs, rho))[0]
+                if np.sign(val_1) * np.sign(val_m) <= 0:
+                    c2 = cm
+                else:
+                    c1 = cm
+                    val_1 = val_m
+            c_out[ii] = 0.5 * (c1 + c2)
+    return c_out
+
 def suggest_similar_windows(pair_name, wins, path_processing, std_threshold=0.05, f_min_check=1.0, f_max_check=50.0):
     wins = [int(w) for w in wins]
     if len(wins) < 3:
@@ -253,7 +333,7 @@ except Exception as e:
     st.stop()
 
 # --- Main Layout Tabs ---
-tab_teori, tab_input, tab_processing, tab_output, tab_inversion = st.tabs(["Teori & Panduan", "Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi Final", "Inversi Vs 1D"])
+tab_teori, tab_input, tab_processing, tab_output, tab_inversion = st.tabs(["Teori & Panduan", "Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi", "Inversi Vs 1D"])
 
 # ==========================================
 # TAB 0: TEORI & PANDUAN
@@ -816,13 +896,13 @@ with tab_processing:
                 
                 st.plotly_chart(fig_spac, use_container_width=True)
                 
-                st.success("Koefisien SPAC rata-rata berhasil ditumpuk! Buka tab 'Kurva Dispersi Final' untuk melihat hasil pencocokan.")
+                st.success("Koefisien SPAC rata-rata berhasil ditumpuk! Buka tab Kurva Dispersi untuk melihat hasil pencocokan.")
 
 # ==========================================
 # TAB 3: DISPERSION CURVE FINAL
 # ==========================================
 with tab_output:
-    st.subheader("3. Kurva Dispersi Final (Pencocokan Fungsi Bessel J0)")
+    st.subheader("3. Kurva Dispersi (Pencocokan Fungsi Bessel J0)")
     
     if "spaccoeff_obj" not in st.session_state:
         st.warning("Silakan selesaikan pemrosesan dan Quality Control di tab Pemrosesan & QC Data terlebih dahulu.")
@@ -1062,10 +1142,10 @@ with tab_output:
 # TAB 5: INVERSI VS 1D
 # ==========================================
 with tab_inversion:
-    st.subheader("4. Inversi Linier Terbobot (1D Vs Profile Inversion)")
+    st.subheader("4. Inversi Monte Carlo (1D Vs Profile Inversion)")
     
     if "f_pv_cut" not in st.session_state or len(st.session_state.f_pv_cut) == 0:
-        st.warning("Silakan selesaikan pemotongan rentang frekuensi kurva dispersi di tab 'Kurva Dispersi Final' terlebih dahulu.")
+        st.warning("Silakan selesaikan pemotongan rentang frekuensi kurva dispersi di tab Kurva Dispersi terlebih dahulu.")
     else:
         # Load active data
         f_obs = st.session_state.f_pv_cut
@@ -1094,15 +1174,43 @@ with tab_inversion:
             coeff_vel = st.number_input("Koefisien Kecepatan Vs (b)", min_value=0.5, max_value=2.0, value=1.1, step=0.05,
                                         help="Vs diestimasi dengan Vs = b * c. Default 1.1")
             
-            st.markdown("#### Parameter Bobot Sinyal (Inversi)")
-            m_weight = st.number_input("Eksponen Pembobotan Kedalaman (m)", min_value=0.5, max_value=5.0, value=1.5, step=0.1,
-                                       help="Mempengaruhi seberapa cepat kepekaan Rayleigh wave memudar terhadap kedalaman. Default 1.5")
-            alpha_damping = st.number_input("Faktor Redaman / Damping (alpha)", min_value=0.0, max_value=10.0, value=0.1, step=0.01,
-                                            help="Mengontrol kemulusan perlapisan Vs. Semakin besar nilai, profil semakin mulus/seragam.")
+            st.markdown("#### Parameter Kontrol Monte Carlo")
+            N_ITER = st.number_input(
+                "Jumlah Iterasi Monte Carlo", 
+                min_value=100, 
+                max_value=5000, 
+                value=1000, 
+                step=100,
+                help="Jumlah total iterasi simulasi Monte Carlo. Nilai lebih besar meningkatkan kecocokan tapi membutuhkan waktu lebih lama."
+            )
+            b_s = st.number_input(
+                "Perturbasi Kecepatan Vs (%)", 
+                min_value=1.0, 
+                max_value=100.0, 
+                value=20.0, 
+                step=1.0,
+                help="Persentase maksimum perubahan kecepatan Vs per iterasi."
+            )
+            b_h = st.number_input(
+                "Perturbasi Ketebalan Lapisan (%)", 
+                min_value=1.0, 
+                max_value=100.0, 
+                value=10.0, 
+                step=1.0,
+                help="Persentase maksimum perubahan ketebalan per iterasi."
+            )
+            DeltaC = st.number_input(
+                "Batas Maksimal Perubahan Vs (m/s)", 
+                min_value=5.0, 
+                max_value=500.0, 
+                value=50.0, 
+                step=5.0,
+                help="Kliping nilai perubahan Vs absolut dalam meter/detik."
+            )
             
         with col_p2:
             st.markdown("#### Konfigurasi Perlapisan (Layering)")
-            num_layers = st.slider("Jumlah Lapisan (N)", min_value=2, max_value=8, value=4, step=1)
+            num_layers = st.slider("Jumlah Lapisan (N)", min_value=3, max_value=8, value=5, step=1)
             
             st.markdown("**Batas Kedalaman Bawah Lapisan (m):**")
             # Automatically suggest depths based on suggested_max_depth
@@ -1129,187 +1237,278 @@ with tab_inversion:
             # Prepare depths array
             d_bounds = np.array(depth_boundaries)
             
-            # Inversion computation
-            M_data = len(f_obs)
-            W_mat = np.zeros((M_data, num_layers))
-            for i in range(M_data):
-                wl = wavelengths[i]
-                for k in range(num_layers):
-                    d_start = d_bounds[k]
-                    d_end = d_bounds[k+1] if k < num_layers-1 else np.inf
-                    W_mat[i, k] = np.exp(-m_weight * d_start / wl) - (np.exp(-m_weight * d_end / wl) if k < num_layers-1 else 0.0)
+            st.markdown("### Eksekusi Inversi")
+            btn_run = st.button("Mulai Inversi Monte Carlo", type="primary")
             
-            # Residual function
-            def residuals_inv(Vs_params, W, c_data, alpha):
-                res_fit = np.dot(W, Vs_params) - c_data
-                res_smooth = np.zeros(len(Vs_params) - 1)
-                for i in range(len(Vs_params) - 1):
-                    res_smooth[i] = np.sqrt(alpha) * (Vs_params[i+1] - Vs_params[i])
-                return np.concatenate([res_fit, res_smooth])
+            # Initialize session state for MC results
+            if "mc_results" not in st.session_state:
+                st.session_state.mc_results = None
                 
-            # Initial guess (average of empirical Vs)
-            emp_vs_vals = coeff_vel * c_obs
-            emp_z_vals = coeff_depth * wavelengths
-            vs0_guess = np.ones(num_layers) * np.mean(emp_vs_vals)
+            if btn_run:
+                # 1. Initialize variables
+                rng = np.random.default_rng()
+                h_curr = np.diff(d_bounds) # thicknesses
+                
+                # Empirical Vs
+                emp_vs_vals = coeff_vel * c_obs
+                emp_z_vals = coeff_depth * wavelengths
+                
+                # Initial Vs guess: robust mapping from empirical
+                vs_init = []
+                for k in range(num_layers):
+                    z_top = d_bounds[k]
+                    z_bottom = d_bounds[k+1] if k < num_layers-1 else np.inf
+                    if z_bottom == np.inf:
+                        idx_points = np.where(emp_z_vals >= z_top)[0]
+                    else:
+                        idx_points = np.where((emp_z_vals >= z_top) & (emp_z_vals < z_bottom))[0]
+                    
+                    if len(idx_points) > 0:
+                        vs_val = float(np.mean(emp_vs_vals[idx_points]))
+                    else:
+                        mid_z = z_top + 10.0 if z_bottom == np.inf else 0.5 * (z_top + z_bottom)
+                        nearest_idx = np.argmin(np.abs(emp_z_vals - mid_z)) if len(emp_z_vals) > 0 else 0
+                        vs_val = float(emp_vs_vals[nearest_idx]) if len(emp_vs_vals) > 0 else 200.0
+                    vs_init.append(vs_val)
+                vs_curr = np.array(vs_init)
+                
+                # Vp from 2.2 * Vs
+                vp_curr = np.maximum(2.2 * vs_curr, 300.0)
+                
+                # Densities
+                rho_curr = np.round(np.linspace(1.6, 2.2, num_layers), 2)
+                
+                # Initial misfit
+                c_curr = calc_curve_fast_optimized(f_obs, h_curr, vp_curr, vs_curr, rho_curr, c_obs)
+                if np.sum(np.isfinite(c_curr)) == len(f_obs):
+                    rmse_curr = np.sqrt(np.mean(((c_curr - c_obs)/c_obs)**2)) * 100
+                else:
+                    rmse_curr = 1e9
+                
+                best_rmse = rmse_curr
+                best_res = (h_curr.copy(), vp_curr.copy(), vs_curr.copy(), rho_curr.copy(), c_curr.copy())
+                
+                # Setup progress tracking
+                progress_bar = st.progress(0.0)
+                status_text = st.empty()
+                
+                # Loop Monte Carlo
+                for step in range(N_ITER):
+                    # PERTURBASI TEBAL (h)
+                    change_h = rng.uniform(-b_h/100, b_h/100, size=len(h_curr)) * h_curr
+                    h_try = np.abs(h_curr + change_h)
+                    
+                    # PERTURBASI Vs
+                    raw_change_vs = rng.uniform(-b_s/100, b_s/100, size=len(vs_curr)) * vs_curr
+                    clamped_change_vs = np.clip(raw_change_vs, -DeltaC, DeltaC)
+                    vs_try = np.abs(vs_curr + clamped_change_vs)
+                    
+                    # Constraint
+                    if vs_try[-1] < 900: 
+                        vs_try[-1] = 850.0 + rng.uniform(0, 50)
+                    
+                    vs_try = np.sort(vs_try)
+                    vp_try = np.maximum(2.2 * vs_try, 300.0)
+                    rho_try = rho_curr
+                    
+                    # Forward modeling
+                    c_try = calc_curve_fast_optimized(f_obs, h_try, vp_try, vs_try, rho_try, c_obs)
+                    
+                    if np.sum(np.isfinite(c_try)) == len(f_obs):
+                        rmse_try = np.sqrt(np.mean(((c_try - c_obs)/c_obs)**2)) * 100
+                        if rmse_try < best_rmse:
+                            best_rmse = rmse_try
+                            best_res = (h_try.copy(), vp_try.copy(), vs_try.copy(), rho_try.copy(), c_try.copy())
+                            h_curr = h_try
+                            vs_curr = vs_try
+                    
+                    # Update progress bar
+                    if (step + 1) % 50 == 0 or step == N_ITER - 1:
+                        progress_bar.progress((step + 1) / N_ITER)
+                        status_text.text(f"Kemajuan: {step+1}/{N_ITER} Iterasi | RMSE Terbaik: {best_rmse:.2f}%")
+                
+                # Save results to session state
+                st.session_state.mc_results = {
+                    "h_fin": best_res[0],
+                    "vp_fin": best_res[1],
+                    "vs_fin": best_res[2],
+                    "rho_fin": best_res[3],
+                    "c_fin": best_res[4],
+                    "best_rmse": best_rmse,
+                    "d_bounds": d_bounds,
+                    "data_hash": data_hash,
+                    "num_layers": num_layers,
+                    "N_ITER": N_ITER,
+                    "b_s": b_s,
+                    "b_h": b_h,
+                    "DeltaC": DeltaC
+                }
+                
+                st.success(f"Inversi Monte Carlo selesai dengan RMSE terbaik: {best_rmse:.2f}%!")
             
-            with st.spinner("Sedang melakukan inversi least-squares..."):
-                try:
-                    # Inversion using bounded least squares
-                    res_opt = least_squares(residuals_inv, vs0_guess, args=(W_mat, c_obs, alpha_damping), bounds=(50.0, 2000.0))
-                    Vs_inverted = res_opt.x
-                    c_calc = np.dot(W_mat, Vs_inverted)
-                    
-                    st.success("Inversi berhasil diselesaikan!")
-                    
-                    # --- Plotting Results ---
-                    col_plot1, col_plot2 = st.columns(2)
-                    
-                    with col_plot1:
-                        st.markdown("#### 1D Shear-Wave Velocity (Vs) Profile")
-                        
-                        # Construct step function for Vs profile
-                        plot_z = []
-                        plot_vs = []
-                        max_plot_depth = float(np.max(emp_z_vals)) * 1.2 if len(emp_z_vals) > 0 else 50.0
-                        
-                        for k in range(num_layers):
-                            z_top = d_bounds[k]
-                            z_bottom = d_bounds[k+1] if k < num_layers-1 else max_plot_depth
-                            plot_z.extend([z_top, z_bottom])
-                            plot_vs.extend([Vs_inverted[k], Vs_inverted[k]])
-                            
-                        fig_vs = go.Figure()
-                        
-                        # Inverted Layered Profile (Step Line)
-                        fig_vs.add_trace(go.Scatter(
-                            x=plot_vs,
-                            y=plot_z,
-                            mode='lines',
-                            name='Vs Terinversi (Layered)',
-                            line=dict(color='red', width=3)
-                        ))
-                        
-                        # Empirical scatter points
-                        fig_vs.add_trace(go.Scatter(
-                            x=emp_vs_vals,
-                            y=emp_z_vals,
-                            mode='markers',
-                            name='Estimasi Empiris (Scatter)',
-                            marker=dict(color='blue', size=6, symbol='circle')
-                        ))
-                        
-                        fig_vs.update_layout(
-                            title=dict(text="Profil Vs 1D terhadap Kedalaman", font=dict(color="black")),
-                            xaxis=dict(
-                                title=dict(text="Kecepatan Gelombang Geser Vs (m/s)", font=dict(color="black")),
-                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
-                            ),
-                            yaxis=dict(
-                                title=dict(text="Kedalaman z (m)", font=dict(color="black")),
-                                autorange="reversed",  # Depth points downwards
-                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
-                            ),
-                            template="plotly_white",
-                            height=450,
-                            plot_bgcolor="white",
-                            paper_bgcolor="white",
-                            legend=dict(font=dict(color="black"))
-                        )
-                        st.plotly_chart(fig_vs, use_container_width=True)
-                        
-                    with col_plot2:
-                        st.markdown("#### Pencocokan Kurva Dispersi (Goodness of Fit)")
-                        
-                        fig_fit = go.Figure()
-                        
-                        # Observed
-                        fig_fit.add_trace(go.Scatter(
-                            x=f_obs,
-                            y=c_obs,
-                            mode='markers+lines',
-                            name='Observed (Hasil Fitting SPAC)',
-                            line=dict(color='black', width=1),
-                            marker=dict(color='black', size=6)
-                        ))
-                        
-                        # Calculated
-                        fig_fit.add_trace(go.Scatter(
-                            x=f_obs,
-                            y=c_calc,
-                            mode='lines',
-                            name='Calculated (Dari Model Vs)',
-                            line=dict(color='blue', width=2.5, dash='dash')
-                        ))
-                        
-                        # Dynamic limits
-                        y_min_fit = float(min(np.min(c_obs), np.min(c_calc)))
-                        y_max_fit = float(max(np.max(c_obs), np.max(c_calc)))
-                        y_pad_fit = (y_max_fit - y_min_fit) * 0.05 if y_max_fit > y_min_fit else 50.0
-                        
-                        fig_fit.update_layout(
-                            title=dict(text="Perbandingan Kurva Dispersi Observasi vs Kalkulasi", font=dict(color="black")),
-                            xaxis=dict(
-                                title=dict(text="Frekuensi (Hz)", font=dict(color="black")),
-                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
-                            ),
-                            yaxis=dict(
-                                title=dict(text="Kecepatan Fase (m/s)", font=dict(color="black")),
-                                range=[y_min_fit - y_pad_fit, y_max_fit + y_pad_fit],
-                                showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")
-                            ),
-                            template="plotly_white",
-                            height=450,
-                            plot_bgcolor="white",
-                            paper_bgcolor="white",
-                            legend=dict(font=dict(color="black"))
-                        )
-                        st.plotly_chart(fig_fit, use_container_width=True)
-                        
-                    # --- Table and Download Inversion Results ---
-                    st.markdown("---")
-                    st.markdown("### Hasil Perlapisan Vs Terinversi")
-                    
-                    # Construct results table
-                    layers_list = []
-                    for k in range(num_layers):
-                        z_top = d_bounds[k]
-                        z_bottom = d_bounds[k+1] if k < num_layers-1 else np.inf
-                        thick = z_bottom - z_top if k < num_layers-1 else np.nan
-                        vs_val = Vs_inverted[k]
-                        
-                        # Get soil class label
-                        if vs_val > 1500:
-                            s_class = "SA (Batuan Keras)"
-                        elif vs_val > 750:
-                            s_class = "SB (Batuan)"
-                        elif vs_val > 350:
-                            s_class = "SC (Tanah Keras / Batuan Lunak)"
-                        elif vs_val > 175:
-                            s_class = "SD (Tanah Sedang)"
-                        else:
-                            s_class = "SE (Tanah Lunak)"
-                            
-                        layers_list.append({
-                            "Lapisan": k + 1,
-                            "Kedalaman Atas (m)": z_top,
-                            "Kedalaman Bawah (m)": z_bottom if k < num_layers-1 else "Infinity",
-                            "Ketebalan (m)": thick if k < num_layers-1 else "Infinity",
-                            "Kecepatan Vs (m/s)": np.round(vs_val, 1),
-                            "Kelas Situs Tanah (FEMA/SNI)": s_class
-                        })
-                        
-                    df_res = pd.DataFrame(layers_list)
-                    st.dataframe(df_res, use_container_width=True)
-                    
-                    # CSV Download
-                    csv_res = df_res.to_csv(index=False)
-                    st.download_button(
-                        label="Unduh Profil Vs Terinversi (CSV)",
-                        data=csv_res,
-                        file_name=f"vs_profile_inversion_layers_{num_layers}.csv",
-                        mime="text/csv",
-                        key="btn_download_vs"
+            # Display results if they exist in session state
+            if st.session_state.mc_results is not None:
+                mc_res = st.session_state.mc_results
+                
+                # Check if current UI parameters match the stored results parameters
+                params_match = (
+                    mc_res["data_hash"] == data_hash and
+                    mc_res["num_layers"] == num_layers and
+                    mc_res["N_ITER"] == N_ITER and
+                    mc_res["b_s"] == b_s and
+                    mc_res["b_h"] == b_h and
+                    mc_res["DeltaC"] == DeltaC and
+                    np.array_equal(mc_res["d_bounds"], d_bounds)
+                )
+                
+                if not params_match:
+                    st.warning("⚠️ Parameter konfigurasi telah berubah sejak inversi terakhir dijalankan. Silakan klik 'Mulai Inversi Monte Carlo' kembali untuk memperbarui hasil.")
+                
+                h_fin = mc_res["h_fin"]
+                vs_fin = mc_res["vs_fin"]
+                c_fin = mc_res["c_fin"]
+                best_rmse = mc_res["best_rmse"]
+                
+                # Empirical Vs for plotting
+                emp_vs_vals = coeff_vel * c_obs
+                emp_z_vals = coeff_depth * wavelengths
+                
+                # Hitung Wavelength (lambda = v / f)
+                lambda_obs = c_obs / f_obs
+                lambda_fin = c_fin / f_obs
+                
+                # Construct cumulative depths for plotting
+                d = [0.0]
+                for th in h_fin:
+                    d.append(d[-1] + th)
+                
+                # Construct step function for Vs profile
+                plot_z = []
+                plot_vs = []
+                for k in range(num_layers - 1):
+                    z_top = d[k]
+                    z_bottom = d[k+1]
+                    plot_vs.extend([vs_fin[k], vs_fin[k]])
+                    plot_z.extend([z_top, z_bottom])
+                
+                # Halfspace extending 30m below the last boundary for visual presentation
+                z_halfspace = d[-1] + 30.0
+                plot_vs.extend([vs_fin[-1], vs_fin[-1]])
+                plot_z.extend([d[-1], z_halfspace])
+                
+                # --- Plotting Results ---
+                col_plot1, col_plot2, col_plot3 = st.columns(3)
+                
+                with col_plot1:
+                    st.markdown("#### Dispersion Curve Fit")
+                    fig_fit = go.Figure()
+                    # Observed
+                    fig_fit.add_trace(go.Scatter(
+                        x=f_obs, y=c_obs, mode='markers+lines', name='Observed',
+                        line=dict(color='black', width=1),
+                        marker=dict(color='black', size=6, symbol='circle')
+                    ))
+                    # Calculated
+                    fig_fit.add_trace(go.Scatter(
+                        x=f_obs, y=c_fin, mode='lines', name='Model Inversi',
+                        line=dict(color='red', width=2.5)
+                    ))
+                    fig_fit.update_layout(
+                        title=dict(text=f"Dispersion Curve (RMSE: {best_rmse:.2f}%)", font=dict(color="black")),
+                        xaxis=dict(title=dict(text="Frequency (Hz)", font=dict(color="black")), showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")),
+                        yaxis=dict(title=dict(text="Phase Velocity (m/s)", font=dict(color="black")), showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")),
+                        template="plotly_white", height=450, plot_bgcolor="white", paper_bgcolor="white",
+                        legend=dict(font=dict(color="black"))
                     )
+                    st.plotly_chart(fig_fit, use_container_width=True)
                     
-                except Exception as ex_inv:
-                    st.error(f"Gagal melakukan proses inversi: {ex_inv}")
+                with col_plot2:
+                    st.markdown("#### Wavelength vs Phase Velocity")
+                    fig_wl = go.Figure()
+                    # Observed
+                    fig_wl.add_trace(go.Scatter(
+                        x=lambda_obs, y=c_obs, mode='markers+lines', name='Observed',
+                        line=dict(color='black', width=1),
+                        marker=dict(color='black', size=6, symbol='circle')
+                    ))
+                    # Calculated
+                    fig_wl.add_trace(go.Scatter(
+                        x=lambda_fin, y=c_fin, mode='lines', name='Model Inversi',
+                        line=dict(color='red', width=2.5)
+                    ))
+                    fig_wl.update_layout(
+                        title=dict(text="Wavelength vs Phase Velocity", font=dict(color="black")),
+                        xaxis=dict(title=dict(text="Wavelength (m)", font=dict(color="black")), showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")),
+                        yaxis=dict(title=dict(text="Phase Velocity (m/s)", font=dict(color="black")), showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")),
+                        template="plotly_white", height=450, plot_bgcolor="white", paper_bgcolor="white",
+                        legend=dict(font=dict(color="black"))
+                    )
+                    st.plotly_chart(fig_wl, use_container_width=True)
+                    
+                with col_plot3:
+                    st.markdown("#### Shear Wave Velocity Profile")
+                    fig_vs = go.Figure()
+                    # Inverted Profile (Red step line)
+                    fig_vs.add_trace(go.Scatter(
+                        x=plot_vs, y=plot_z, mode='lines', name='Vs Terinversi (Layered)',
+                        line=dict(color='red', width=3)
+                    ))
+                    # Empirical scatter points
+                    fig_vs.add_trace(go.Scatter(
+                        x=emp_vs_vals, y=emp_z_vals, mode='markers', name='Estimasi Empiris (Scatter)',
+                        marker=dict(color='blue', size=6, symbol='circle')
+                    ))
+                    fig_vs.update_layout(
+                        title=dict(text="Profil Vs 1D terhadap Kedalaman", font=dict(color="black")),
+                        xaxis=dict(title=dict(text="Vs (m/s)", font=dict(color="black")), showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")),
+                        yaxis=dict(title=dict(text="Depth (m)", font=dict(color="black")), autorange="reversed", showgrid=True, gridcolor="lightgray", linecolor="black", ticks="outside", tickcolor="black", tickfont=dict(color="black")),
+                        template="plotly_white", height=450, plot_bgcolor="white", paper_bgcolor="white",
+                        legend=dict(font=dict(color="black"))
+                    )
+                    st.plotly_chart(fig_vs, use_container_width=True)
+                
+                # --- Table and Download Inversion Results ---
+                st.markdown("---")
+                st.markdown("### Hasil Perlapisan Vs Terinversi (Monte Carlo)")
+                
+                # Construct results table
+                layers_list = []
+                for k in range(num_layers):
+                    z_top = d[k]
+                    z_bottom = d[k+1] if k < num_layers-1 else np.inf
+                    thick = h_fin[k] if k < num_layers-1 else np.nan
+                    vs_val = vs_fin[k]
+                    
+                    # Get soil class label
+                    if vs_val > 1500:
+                        s_class = "SA (Batuan Keras)"
+                    elif vs_val > 750:
+                        s_class = "SB (Batuan)"
+                    elif vs_val > 350:
+                        s_class = "SC (Tanah Keras / Batuan Lunak)"
+                    elif vs_val > 175:
+                        s_class = "SD (Tanah Sedang)"
+                    else:
+                        s_class = "SE (Tanah Lunak)"
+                        
+                    layers_list.append({
+                        "Lapisan": k + 1,
+                        "Kedalaman Atas (m)": z_top,
+                        "Kedalaman Bawah (m)": z_bottom if k < num_layers-1 else "Infinity",
+                        "Ketebalan (m)": thick if k < num_layers-1 else "Infinity",
+                        "Kecepatan Vs (m/s)": np.round(vs_val, 1),
+                        "Kelas Situs Tanah (FEMA/SNI)": s_class
+                    })
+                    
+                df_res = pd.DataFrame(layers_list)
+                st.dataframe(df_res, use_container_width=True)
+                
+                # CSV Download
+                csv_res = df_res.to_csv(index=False)
+                st.download_button(
+                    label="Unduh Profil Vs Terinversi (CSV)",
+                    data=csv_res,
+                    file_name=f"vs_profile_montecarlo_layers_{num_layers}.csv",
+                    mime="text/csv",
+                    key="btn_download_vs_mc"
+                )
