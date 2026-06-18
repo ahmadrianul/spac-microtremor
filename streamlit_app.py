@@ -558,9 +558,10 @@ with tab_teori:
         st.markdown(r'''
             #### 6. Ucapan Terima Kasih
             
-            Apresiasi dan terima kasih setinggi-tingginya ditujukan kepada Ahmad Fauzy (Geofisika 2018, Universitas Hasanuddin). 
+            Saya (Ahmad Rianul Qauliah, Geofisika 2020, Universitas Hasanuddin) selaku pengembang web app interaktif ini, mengucapkan apresiasi dan terima kasih kepada Ahmad Fauzy (Geofisika 2018, Universitas Hasanuddin). 
             
-            Pustaka pemrosesan dasar (*framework*) metode SPAC yang mendasari dan menggerakkan aplikasi web interaktif ini dikembangkan berdasarkan kode sumber terbuka yang dipublikasikan pada repositori GitHub dan dapat diakses secara bebas oleh publik.
+            Pustaka pemrosesan dasar (*framework*) metode SPAC yang dipublikasikan pada repositori GitHub beliau menjadi salah satu dasar untuk menggerakkan aplikasi web interaktif ini.
+            
         ''')
 
 # ==========================================
