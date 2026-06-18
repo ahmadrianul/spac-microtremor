@@ -552,6 +552,7 @@ with tab_teori:
             2.  Cho, I. (2020). Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747.
             3.  Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022). Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627.
             4.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
+            5. Syamsuddin, E., Arif, A.F., Makhrani, Arsyad, A., Effendi, R. (2025). Spatial Autocorrelation Method (SPAC) for Subsurface Shear Wave Velocity Profiling: A Non-invasive Approach for Site Characterization. IOP Conference Series: Earth and Environmental Science, 1525, 012017.
         """)
         
     elif topik == "6. Ucapan Terima Kasih":
