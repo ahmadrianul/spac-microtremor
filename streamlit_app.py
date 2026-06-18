@@ -349,7 +349,8 @@ with tab_teori:
             "2. Formulasi Matematis & Rumus",
             "3. Desain Akuisisi Data Sekuensial (Two-Station)",
             "4. Alur Pengolahan Data (Step-by-Step)",
-            "5. Dukungan Artikel & Jurnal Ilmiah"
+            "5. Dukungan Artikel & Jurnal Ilmiah",
+            "6. Ucapan Terima Kasih (Special Thanks)"
         ],
         key="topik_teori"
     )
@@ -547,10 +548,22 @@ with tab_teori:
             Berikut adalah daftar pustaka artikel ilmiah utama yang melandasi metode SPAC sekuensial:
             
             1.  Aki, K. (1957). Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
-            2.  Cho, I. (2020). Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747.
-            3.  Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022). Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627.
-            4.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
+            2.  Chimoto, K., Onishi, K., & Matsuoka, T. (2023). Simple SPAC processing method using zero-crossing analysis of 1-bit data processing for real-time monitoring of velocity change. *Exploration Geophysics*, 1–13. https://doi.org/10.1186/s40623-023-01842-3
+            3.  Cho, I. (2020). Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747. https://doi.org/10.1093/gji/ggz454
+            4.  Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022). Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627. https://doi.org/10.1007/s10712-018-9474-2
+            5.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
         """)
+        
+    elif topik == "6. Ucapan Terima Kasih (Special Thanks)":
+        st.markdown(r'''
+            #### 6. Ucapan Terima Kasih (Special Thanks)
+            
+            Apresiasi dan terima kasih setinggi-tingginya ditujukan kepada senior saya, **Ahmad Fauzy (Geofisika 2018, Universitas Hasanuddin)**. 
+            
+            Pustaka pemrosesan dasar (*framework/processing engine*) metode SPAC yang mendasari dan menggerakkan aplikasi web interaktif ini dikembangkan berdasarkan kode sumber terbuka (*open-source*) yang dipublikasikan oleh beliau pada repositori GitHub dan dapat diakses secara bebas oleh publik.
+            
+            Kontribusi dan keterbukaan informasi ini sangat membantu serta mempermudah pengembangan aplikasi ekstraksi dispersi mikrotremor yang modern, portabel, dan ramah pengguna ini.
+        ''')
 
 # ==========================================
 # TAB 1: INPUT DATA
@@ -583,7 +596,7 @@ with tab_input:
     
     # Demo Data Option
     st.write("**Belum punya data lapangan?** Gunakan data demo mikrotremor kami untuk mencoba:")
-    demo_btn = st.button("Gunakan Data Demo (Site Lonjoboko, Gowa)")
+    demo_btn = st.button("Gunakan Data Demo (Site Hasanuddin University)")
     
     if demo_btn:
         # We will copy demo data from local demo_data folder in the repo
