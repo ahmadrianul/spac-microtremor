@@ -287,7 +287,7 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
-st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)<br><span style="font-size: 0.95rem; font-weight: 600; color: #4B5563; display: block; margin-top: 0.5rem;">Ahmad Rianul Qauliah (Geofisika 2020 Universitas Hasanuddin)</span></div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)<br><span style="font-size: 0.75rem; font-weight: 600; color: #4B5563; display: block; margin-top: 0.5rem;">Ahmad Rianul Qauliah (Geofisika 2020, Universitas Hasanuddin)</span></div>', unsafe_allow_html=True)
 
 # --- Session State Initialization ---
 if "session_id" not in st.session_state:
