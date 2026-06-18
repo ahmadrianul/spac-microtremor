@@ -266,9 +266,10 @@ st.markdown("""
 # Title Area
 st.markdown("""
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; margin-bottom: 1.5rem; text-align: center;">
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
-            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; letter-spacing: -1.5px; line-height: 1;">SP</span>
-            <svg width="50" height="50" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-right: 10px;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; gap: 12px;">
+            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; line-height: 1;">S</span>
+            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; line-height: 1;">P</span>
+            <svg width="50" height="50" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="display: block; transform: translateY(2px);">
                 <!-- Triangle Lines representing letter A -->
                 <line x1="6" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
                 <line x1="38" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
@@ -283,7 +284,7 @@ st.markdown("""
                 <!-- Center Node -->
                 <circle cx="22" cy="26.7" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
             </svg>
-            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; letter-spacing: -1.5px; line-height: 1;">C</span>
+            <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; line-height: 1;">C</span>
         </div>
     </div>
 """, unsafe_allow_html=True)
