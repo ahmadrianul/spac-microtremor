@@ -268,7 +268,7 @@ st.markdown("""
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; margin-bottom: 1.5rem; text-align: center;">
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
             <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; letter-spacing: -1.5px; line-height: 1;">SP</span>
-            <svg width="50" height="50" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="margin-left: 4px; margin-right: 4px; margin-bottom: 4px;">
+            <svg width="50" height="50" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-right: 10px;">
                 <!-- Triangle Lines representing letter A -->
                 <line x1="6" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
                 <line x1="38" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
@@ -287,7 +287,7 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
-st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)<br><span style="font-size: 0.95rem; font-weight: 600; color: #4B5563; display: block; margin-top: 0.5rem;">Ahmad Rianul Qauliah (Geofisika 2020 Universitas Hasanuddin)</span></div>', unsafe_allow_html=True)
 
 # --- Session State Initialization ---
 if "session_id" not in st.session_state:
