@@ -554,15 +554,13 @@ with tab_teori:
             5.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
         """)
         
-    elif topik == "6. Ucapan Terima Kasih (Special Thanks)":
+    elif topik == "6. Ucapan Terima Kasih":
         st.markdown(r'''
-            #### 6. Ucapan Terima Kasih (Special Thanks)
+            #### 6. Ucapan Terima Kasih
             
-            Apresiasi dan terima kasih setinggi-tingginya ditujukan kepada senior saya, **Ahmad Fauzy (Geofisika 2018, Universitas Hasanuddin)**. 
+            Apresiasi dan terima kasih setinggi-tingginya ditujukan kepada Ahmad Fauzy (Geofisika 2018, Universitas Hasanuddin). 
             
-            Pustaka pemrosesan dasar (*framework/processing engine*) metode SPAC yang mendasari dan menggerakkan aplikasi web interaktif ini dikembangkan berdasarkan kode sumber terbuka (*open-source*) yang dipublikasikan oleh beliau pada repositori GitHub dan dapat diakses secara bebas oleh publik.
-            
-            Kontribusi dan keterbukaan informasi ini sangat membantu serta mempermudah pengembangan aplikasi ekstraksi dispersi mikrotremor yang modern, portabel, dan ramah pengguna ini.
+            Pustaka pemrosesan dasar (*framework) metode SPAC yang mendasari dan menggerakkan aplikasi web interaktif ini dikembangkan berdasarkan kode sumber terbuka yang dipublikasikan pada repositori GitHub dan dapat diakses secara bebas oleh publik.
         ''')
 
 # ==========================================
