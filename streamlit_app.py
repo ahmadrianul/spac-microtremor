@@ -287,7 +287,7 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
-st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)<br><span style="font-size: 0.95rem; font-weight: normal; color: inherit; display: block; margin-top: 0.4rem;">Ahmad Rianul Qauliah (Geofisika 2020, Universitas Hasanuddin)</span></div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
 
 # --- Session State Initialization ---
 if "session_id" not in st.session_state:
@@ -594,7 +594,7 @@ with tab_input:
     
     # Demo Data Option
     st.write("**Belum punya data lapangan?** Gunakan data demo mikrotremor kami untuk mencoba:")
-    demo_btn = st.button("Gunakan Data Demo (Site Hasanuddin University)")
+    demo_btn = st.button("Gunakan Data Demo")
     
     if demo_btn:
         # We will copy demo data from local demo_data folder in the repo
