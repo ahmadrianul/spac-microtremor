@@ -350,7 +350,7 @@ with tab_teori:
             "3. Desain Akuisisi Data Sekuensial (Two-Station)",
             "4. Alur Pengolahan Data (Step-by-Step)",
             "5. Dukungan Artikel & Jurnal Ilmiah",
-            "6. Ucapan Terima Kasih (Special Thanks)"
+            "6. Ucapan Terima Kasih"
         ],
         key="topik_teori"
     )
@@ -560,7 +560,7 @@ with tab_teori:
             
             Apresiasi dan terima kasih setinggi-tingginya ditujukan kepada Ahmad Fauzy (Geofisika 2018, Universitas Hasanuddin). 
             
-            Pustaka pemrosesan dasar (*framework) metode SPAC yang mendasari dan menggerakkan aplikasi web interaktif ini dikembangkan berdasarkan kode sumber terbuka yang dipublikasikan pada repositori GitHub dan dapat diakses secara bebas oleh publik.
+            Pustaka pemrosesan dasar (*framework*) metode SPAC yang mendasari dan menggerakkan aplikasi web interaktif ini dikembangkan berdasarkan kode sumber terbuka yang dipublikasikan pada repositori GitHub dan dapat diakses secara bebas oleh publik.
         ''')
 
 # ==========================================
