@@ -509,7 +509,7 @@ with tab_teori:
             ##### B. Parameter Akuisisi Data Lapangan
             *   **Radius Array ($r$):** $r$ (jari-jari array segitiga lapangan).
             *   **Durasi Perekaman:** minimal 20 menit untuk masing-masing stasiun pasangan (total ~60 menit perekaman).
-            *   **Sampling Rate:** 100 Hz (diperoleh langsung dari metadata/header file rekaman seismik .sac/.mseed yang diunggah).
+            *   **Sampling Rate:** 100 Hz (diperoleh langsung dari metadata/header file rekaman .sac/.mseed yang diunggah).
             *   **Sensor Geofon:** Geofon (komponen vertikal).
             
             ##### C. Asumsi Kunci
@@ -652,7 +652,7 @@ with tab_input:
     if len(st.session_state.data_list_by_pair) > 0:
         st.info(f"File siap untuk diproses: " + ", ".join([f"{k}: {v}" for k, v in st.session_state.data_list_by_pair.items()]))
     else:
-        st.warning("Silakan unggah set data seismik minimal 1 sesi atau gunakan Data Demo.")
+        st.warning("Silakan unggah set data minimal 1 sesi atau gunakan Data Demo.")
 
 # ==========================================
 # TAB 2: PROSES & QUALITY CONTROL
