@@ -269,22 +269,22 @@ st.markdown("""
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; gap: 12px;">
             <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; line-height: 1;">S</span>
             <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; line-height: 1;">P</span>
-            <svg width="50" height="50" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="display: block; transform: translateY(2px);">
+            <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="display: block; transform: translateY(2px);">
                 <!-- Circular Track for array -->
-                <circle cx="22" cy="26.7" r="18.6" fill="none" stroke="#FF4B4B" stroke-width="2.2" stroke-dasharray="3,3" />
+                <circle cx="25" cy="29.2" r="18.6" fill="none" stroke="#FF4B4B" stroke-width="2.2" stroke-dasharray="3,3" />
                 <!-- Triangle Lines representing letter A -->
-                <line x1="6" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
-                <line x1="38" y1="36" x2="22" y2="8" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
-                <line x1="6" y1="36" x2="38" y2="36" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+                <line x1="9" y1="38.5" x2="25" y2="10.5" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+                <line x1="41" y1="38.5" x2="25" y2="10.5" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
+                <line x1="9" y1="38.5" x2="41" y2="38.5" stroke="#FF4B4B" stroke-width="4.5" stroke-linecap="round" />
                 <!-- Vertices & Center Donuts -->
                 <!-- Top Vertex -->
-                <circle cx="22" cy="8" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+                <circle cx="25" cy="10.5" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
                 <!-- Bottom-Left Vertex -->
-                <circle cx="6" cy="36" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+                <circle cx="9" cy="38.5" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
                 <!-- Bottom-Right Vertex -->
-                <circle cx="38" cy="36" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+                <circle cx="41" cy="38.5" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
                 <!-- Center Node -->
-                <circle cx="22" cy="26.7" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
+                <circle cx="25" cy="29.2" r="5" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="2.5" />
             </svg>
             <span style="font-family: 'Inter', 'Outfit', 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; color: #111827; line-height: 1;">C</span>
         </div>
