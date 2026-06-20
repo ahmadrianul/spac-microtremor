@@ -621,9 +621,9 @@ with tab_input:
         min_value=1,
         max_value=20,
         value=st.session_state.n_sessions_input,
-        step=1,
-        key="n_sessions_input"
+        step=1
     )
+    st.session_state.n_sessions_input = n_sessions
 
     # Dynamic grid of uploaders (3 columns per row)
     for i in range(0, n_sessions, 3):
