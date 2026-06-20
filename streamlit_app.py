@@ -463,57 +463,99 @@ with tab_teori:
         st.markdown(r"""
             #### 3. Desain Akuisisi Data Sekuensial (Two-Station Method)
             
-            Secara konvensional, survei SPAC memerlukan susunan sensor (*array*) melingkar atau segitiga sama sisi yang merekam secara simultan (minimal menggunakan 4 geofon: 1 pusat, 3 keliling). Namun, konfigurasi tersebut membutuhkan banyak peralatan geofon dan kabel bentangan yang rumit.
+            Secara konvensional, survei SPAC memerlukan susunan sensor (*array*) melingkar yang merekam secara simultan (misalnya 1 pusat, 3 atau lebih keliling). Namun, konfigurasi tersebut membutuhkan banyak peralatan geofon dan bentangan kabel yang rumit di lapangan.
             
             ##### A. Konsep Metode Dua Sensor (Two-Station Method)
-            Untuk meningkatkan efisiensi di lapangan, metode SPAC Sekuensial (Two-Station Method) dapat diterapkan hanya dengan menggunakan 2 buah geofon (seperti unit sensor SmartSolo 3C).
+            Untuk meningkatkan efisiensi di lapangan, metode SPAC Sekuensial (Two-Station Method) diterapkan dengan hanya menggunakan 2 buah geofon (seperti unit sensor SmartSolo 3C). 
             
-            Sinyal direkam secara bertahap (sekuensial) dengan konfigurasi geometri segitiga sama sisi sebagai berikut:
-            1.  **Geofon Referensi Tetap (Pusat A):** Diletakkan tetap di titik pusat koordinat selama seluruh sesi pengukuran.
-            2.  **Geofon Bergerak (Rover B):** Dipindahkan secara berurutan ke stasiun keliling lingkaran pada radius $r$ yang sama, yaitu di titik B1, B2, dan B3 (membentuk sudut pisah $120^\circ$ satu sama lain).
+            Sinyal direkam secara bertahap (sekuensial) dengan konfigurasi geometri stasiun geofon sebagai berikut:
+            1.  **Geofon Referensi Tetap (Pusat A):** Diletakkan tetap di titik pusat lingkaran selama seluruh sesi pengukuran.
+            2.  **Geofon Bergerak (Rover B):** Dipindahkan secara berurutan ke stasiun keliling lingkaran pada radius $r$ yang sama di beberapa titik ($B_1, B_2, \dots, B_n$).
             
-            Perekaman dilakukan selama durasi tertentu pada masing-masing dari 3 stasiun pasangan (A-B1 pada Sesi 1, A-B2 pada Sesi 2, dan A-B3 pada Sesi 3).
+            Metode ini dapat diterapkan pada dua jenis susunan geometri utama:
+            *   **Geometri Segitiga Sama Sisi (3 Sesi):** Geofon bergerak dipindahkan ke 3 titik stasiun keliling ($B_1, B_2, B_3$) yang membentuk sudut pisah $120^\circ$ satu sama lain (memerlukan 3 sesi perekaman).
+            *   **Geometri Lingkaran Umum (N Sesi):** Geofon bergerak dipindahkan ke $N$ stasiun keliling lingkaran ($B_1, B_2, \dots, B_n$) untuk memperoleh resolusi azimuthal yang lebih tinggi (memerlukan $N$ sesi perekaman).
         """)
         
-        # Render larger SVG array geometry illustration
-        st.markdown("""
-            <div style="display: flex; justify-content: center; margin-top: 1rem; margin-bottom: 1rem; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
-                <svg width="220" height="190" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Triangle Lines -->
-                    <line x1="100" y1="15" x2="35" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
-                    <line x1="100" y1="15" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
-                    <line x1="35" y1="128" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
-                    <!-- Radius lines (dashed) -->
-                    <line x1="100" y1="90" x2="100" y2="15" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                    <line x1="100" y1="90" x2="35" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                    <line x1="100" y1="90" x2="165" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                    <!-- Center Node A -->
-                    <circle cx="100" cy="90" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
-                    <text x="100" y="93.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
-                    <!-- Top Vertex B1 -->
-                    <circle cx="100" cy="15" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                    <text x="100" y="18.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
-                    <!-- Bottom-Left Vertex B3 -->
-                    <circle cx="35" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                    <text x="35" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
-                    <!-- Bottom-Right Vertex B2 -->
-                    <circle cx="165" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                    <text x="165" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
-                    <!-- Radius Text -->
-                    <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
-                </svg>
-            </div>
-        """, unsafe_allow_html=True)
-        
+        # Render both SVG diagrams side-by-side
+        col_diag1, col_diag2 = st.columns(2)
+        with col_diag1:
+            st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>A. Geometri Segitiga Sama Sisi (3 Sesi)</div>", unsafe_allow_html=True)
+            st.markdown("""
+                <div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
+                    <svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Triangle Lines -->
+                        <line x1="100" y1="15" x2="35" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+                        <line x1="100" y1="15" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+                        <line x1="35" y1="128" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+                        <!-- Radius lines (dashed) -->
+                        <line x1="100" y1="90" x2="100" y2="15" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <line x1="100" y1="90" x2="35" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <line x1="100" y1="90" x2="165" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <!-- Center Node A -->
+                        <circle cx="100" cy="90" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
+                        <text x="100" y="93.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
+                        <!-- Top Vertex B1 -->
+                        <circle cx="100" cy="15" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="100" y="18.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
+                        <!-- Bottom-Left Vertex B3 -->
+                        <circle cx="35" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="35" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
+                        <!-- Bottom-Right Vertex B2 -->
+                        <circle cx="165" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="165" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
+                        <!-- Radius Text -->
+                        <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
+                    </svg>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with col_diag2:
+            st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>B. Geometri Lingkaran Umum (N Sesi)</div>", unsafe_allow_html=True)
+            st.markdown("""
+                <div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
+                    <svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Circular track (dashed) -->
+                        <circle cx="100" cy="85" r="60" fill="none" stroke="#FF4B4B" stroke-width="2.5" stroke-dasharray="5,5" />
+                        <!-- Radius lines (dashed) -->
+                        <line x1="100" y1="85" x2="100" y2="25" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <line x1="100" y1="85" x2="157" y2="66" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <line x1="100" y1="85" x2="135" y2="134" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <line x1="100" y1="85" x2="65" y2="134" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <line x1="100" y1="85" x2="43" y2="66" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+                        <!-- Center Node A -->
+                        <circle cx="100" cy="85" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
+                        <text x="100" y="88.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
+                        <!-- Perimeter Nodes B1 to Bn -->
+                        <circle cx="100" cy="25" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="100" y="28.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
+                        
+                        <circle cx="157" cy="66" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="157" y="69.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
+                        
+                        <circle cx="135" cy="134" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="135" y="137.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
+                        
+                        <circle cx="65" cy="134" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="65" y="137.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B4</text>
+                        
+                        <circle cx="43" cy="66" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+                        <text x="43" y="69.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">Bn</text>
+                        <!-- Radius Text -->
+                        <text x="100" y="160" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
+                    </svg>
+                </div>
+            """, unsafe_allow_html=True)
+            
         st.markdown(r"""
             ##### B. Parameter Akuisisi Data Lapangan
-            *   **Radius Array ($r$):** $r$ (jari-jari array segitiga lapangan).
-            *   **Durasi Perekaman:** minimal 20 menit untuk masing-masing stasiun pasangan (total ~60 menit perekaman).
-            *   **Sampling Rate:** 100 Hz (diperoleh langsung dari metadata/header file rekaman .sac/.mseed yang diunggah).
+            *   **Radius Array ($r$):** $r$ (jari-jari stasiun geofon keliling dari pusat).
+            *   **Durasi Perekaman:** minimal 20 menit untuk masing-masing stasiun pasangan (total durasi menyesuaikan jumlah sesi).
+            *   **Sampling Rate:** 100 Hz (diperoleh langsung dari metadata/header file rekaman seismik .sac/.mseed yang diunggah).
             *   **Sensor Geofon:** Geofon (komponen vertikal).
             
             ##### C. Asumsi Kunci
-            Metode ini sangat bergantung pada asumsi bahwa medan getaran ambient noise bersifat stasioner (karakteristik statistiknya stabil dan tidak berubah) sepanjang total durasi perekaman ketiga sesi tersebut. Rata-rata azimuthal disimulasikan secara numerik saat pemrosesan data dengan merata-ratakan hasil koherensi silang dari ketiga stasiun pasangan yang direkam secara terpisah tersebut.
+            Metode ini sangat bergantung pada asumsi bahwa medan getaran ambient noise bersifat stasioner (karakteristik statistiknya stabil dan tidak berubah) sepanjang total durasi perekaman seluruh sesi tersebut. Rata-rata azimuthal disimulasikan secara numerik saat pemrosesan data dengan merata-ratakan hasil koherensi silang dari semua stasiun pasangan yang direkam secara terpisah tersebut.
         """)
         
     elif topik == "4. Alur Pengolahan Data (Step-by-Step)":
@@ -523,21 +565,21 @@ with tab_teori:
             Proses pengolahan data mikrotremor metode SPAC sekuensial dari berkas mentah hingga menjadi kurva dispersi final dilakukan melalui tahapan berikut:
             
             1.  **Input Data Seismogram:**
-                Membaca file rekaman biner seismik berformat SAC atau MINISEED untuk stasiun referensi (A) dan stasiun keliling (B) untuk masing-masing sesi (Pair 1, Pair 2, Pair 3).
+                Membaca file rekaman biner seismik berformat SAC atau MINISEED untuk stasiun referensi (A) dan stasiun keliling (B) untuk seluruh sesi pengukuran (Sesi 1, Sesi 2, ..., Sesi N).
             2.  **Segmentasi Waktu (Windowing):**
                 Sinyal kontinu berdurasi panjang disegmentasi menjadi sejumlah jendela waktu yang lebih pendek (misalnya panjang jendela sebesar $2^{13} = 8192$ sampel atau setara 81.92 detik pada sampling rate 100 Hz) dengan *overlap* tertentu. Hal ini berguna untuk mengisolasi segmen data yang stasioner dan membuang gangguan transient noise lokal (seperti getaran akibat kendaraan yang lewat sangat dekat).
             3.  **Transformasi Spektral (FFT):**
                 Setiap jendela waktu dari data domain waktu ditransformasikan ke domain frekuensi menggunakan algoritma Fast Fourier Transform (FFT) guna mendapatkan spektrum amplitudo dan fase sinyal.
             4.  **Kalkulasi Kompleks Koherensi:**
-                Kompleks koherensi dihitung pada setiap frekuensi untuk setiap jendela waktu pada masing-masing sesi stasiun pasangan (A-B1, A-B2, A-B3).
+                Kompleks koherensi dihitung pada setiap frekuensi untuk setiap jendela waktu pada masing-masing sesi stasiun pasangan (A-B1, A-B2, ..., A-Bn).
             5.  **Quality Control (QC) & Seleksi Jendela Otomatis:**
                 *   **Evaluasi RMSE:** Aplikasi menghitung selisih (Root Mean Square Error / RMSE) antara nilai koherensi setiap jendela terhadap nilai median koherensi pada rentang frekuensi kontrol (1 - 50 Hz).
                 *   **Saran Window:** Jendela dengan RMSE di bawah batas cutoff (misalnya median + 0.05 standar deviasi) diklasifikasikan sebagai jendela bersih (konsisten), sedangkan jendela dengan RMSE tinggi diklasifikasikan sebagai outlier (noise) dan disarankan untuk dibuang.
             6.  **Rata-rata Dua Tahap (Two-Stage Stacking):**
-                *   *Tahap 1:* Jendela-jendela yang terpilih di dalam masing-masing sesi dirata-ratakan secara independen untuk mendapatkan kurva koefisien SPAC Sesi 1 ($\rho_1$), Sesi 2 ($\rho_2$), dan Sesi 3 ($\rho_3$).
-                *   *Tahap 2:* Ketiga kurva rata-rata sesi tersebut kemudian dirata-ratakan secara bersama-sama untuk mendapatkan kurva koefisien SPAC akhir ($\rho_{avg}$). Hal ini penting untuk menjamin pembobotan spasial yang seimbang dari segala arah sensor.
+                *   *Tahap 1:* Jendela-jendela yang terpilih di dalam masing-masing sesi dirata-ratakan secara independen untuk mendapatkan kurva koefisien SPAC rata-rata masing-masing sesi ($\rho_1, \rho_2, \dots, \rho_N$).
+                *   *Tahap 2:* Semua kurva rata-rata sesi tersebut kemudian dirata-ratakan secara bersama-sama untuk mendapatkan kurva koefisien SPAC akhir ($\rho_{avg}$). Hal ini penting untuk menjamin pembobotan spasial yang seimbang dari segala arah sensor.
             7.  **Pencocokan Fungsi Bessel (Bessel Fitting):**
-                Nilai koefisien SPAC rata-rata akhir $\rho_{avg}(f)$ dicocokkan dengan kurva Bessel teoritis $J_0(x)$ menggunakan metode kuadrat terkecil (*least-squares fitting*) to memperoleh nilai argumen Bessel $x = kr$ pada setiap frekuensi.
+                Nilai koefisien SPAC rata-rata akhir $\rho_{avg}(f)$ dicocokkan dengan kurva Bessel teoritis $J_0(x)$ menggunakan metode kuadrat terkecil (*least-squares fitting*) untuk memperoleh nilai argumen Bessel $x = kr$ pada setiap frekuensi.
             8.  **Ekstraksi Kurva Dispersi:**
                 Kecepatan fase Rayleigh dihitung menggunakan rumus $c(f) = \frac{2\pi f r}{x}$. Hasilnya kemudian disaring dalam batasan kecepatan fase minimum dan maksimum, serta dapat dipotong (*frequency cut*) pada rentang frekuensi yang bersih dari noise.
         """)
@@ -570,27 +612,31 @@ with tab_teori:
 # ==========================================
 with tab_input:
     st.subheader("1. Unggah File Waveform (.sac / .mseed)")
-    st.write("Unggah pasangan stasiun pusat (A) dan stasiun keliling (B) untuk masing-masing 3 sesi pemindahan alat:")
+    st.write("Atur jumlah sesi pengukuran (pasangan stasiun) lalu unggah berkas geofon pusat (A) dan keliling (B) untuk masing-masing sesi:")
 
-    col_s1, col_s2, col_s3 = st.columns(3)
-    
-    with col_s1:
-        st.markdown("### Sesi 1 (A - B1)")
-        st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
-        file_a1 = st.file_uploader("Upload Pusat A Sesi 1", type=["sac", "mseed"], key="file_a1")
-        file_b1 = st.file_uploader("Upload Keliling B1 Sesi 1", type=["sac", "mseed"], key="file_b1")
-        
-    with col_s2:
-        st.markdown("### Sesi 2 (A - B2)")
-        st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
-        file_a2 = st.file_uploader("Upload Pusat A Sesi 2", type=["sac", "mseed"], key="file_a2")
-        file_b2 = st.file_uploader("Upload Keliling B2 Sesi 2", type=["sac", "mseed"], key="file_b2")
+    # Input for number of sessions
+    if "n_sessions_input" not in st.session_state:
+        st.session_state.n_sessions_input = 3
 
-    with col_s3:
-        st.markdown("### Sesi 3 (A - B3)")
-        st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
-        file_a3 = st.file_uploader("Upload Pusat A Sesi 3", type=["sac", "mseed"], key="file_a3")
-        file_b3 = st.file_uploader("Upload Keliling B3 Sesi 3", type=["sac", "mseed"], key="file_b3")
+    n_sessions = st.number_input(
+        "Jumlah Sesi Pengukuran (Jumlah Pasangan Stasiun)",
+        min_value=1,
+        max_value=20,
+        value=st.session_state.n_sessions_input,
+        step=1,
+        key="n_sessions_input"
+    )
+
+    # Dynamic grid of uploaders (3 columns per row)
+    for i in range(0, n_sessions, 3):
+        cols = st.columns(min(3, n_sessions - i))
+        for j, col in enumerate(cols):
+            idx = i + j + 1
+            with col:
+                st.markdown(f"### Sesi {idx} (A - B{idx})")
+                st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
+                file_a = st.file_uploader(f"Upload Pusat A Sesi {idx}", type=["sac", "mseed"], key=f"file_a{idx}")
+                file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed"], key=f"file_b{idx}")
 
     st.markdown("---")
     
@@ -607,51 +653,43 @@ with tab_input:
                     src_path = os.path.join(demo_src_dir, demo_file)
                     dest_path = os.path.join(main_folder.path_data, demo_file)
                     shutil.copy(src_path, dest_path)
-                st.success("Berhasil memuat Data Demo! Buka tab 'Pemrosesan & Quality Control' untuk mulai memproses.")
+                st.session_state.n_sessions_input = 3
                 st.session_state.demo_loaded = True
                 st.session_state.data_list_by_pair = {
                     "Pair_1": ["A41.sac", "B41.sac"],
                     "Pair_2": ["A42.sac", "B42.sac"],
                     "Pair_3": ["A43.sac", "B43.sac"]
                 }
+                st.success("Berhasil memuat Data Demo! Buka tab 'Pemrosesan & Quality Control' untuk mulai memproses.")
+                st.rerun()
             except Exception as ex:
                 st.error(f"Gagal menyalin data demo: {ex}")
         else:
             st.warning("Folder data demo tidak ditemukan. Silakan unggah file Anda secara manual.")
 
     # Save Uploaded Files
-    if not demo_btn:
+    # Check if user has uploaded any files, if so, only use the uploaded files
+    any_uploaded = any(
+        st.session_state.get(f"file_a{idx}") is not None or st.session_state.get(f"file_b{idx}") is not None
+        for idx in range(1, n_sessions + 1)
+    )
+
+    if any_uploaded:
         pairs_to_process = {}
-        # Sesi 1
-        if file_a1 and file_b1:
-            with open(os.path.join(main_folder.path_data, file_a1.name), "wb") as f:
-                f.write(file_a1.getbuffer())
-            with open(os.path.join(main_folder.path_data, file_b1.name), "wb") as f:
-                f.write(file_b1.getbuffer())
-            pairs_to_process["Pair_1"] = [file_a1.name, file_b1.name]
-            
-        # Sesi 2
-        if file_a2 and file_b2:
-            with open(os.path.join(main_folder.path_data, file_a2.name), "wb") as f:
-                f.write(file_a2.getbuffer())
-            with open(os.path.join(main_folder.path_data, file_b2.name), "wb") as f:
-                f.write(file_b2.getbuffer())
-            pairs_to_process["Pair_2"] = [file_a2.name, file_b2.name]
-
-        # Sesi 3
-        if file_a3 and file_b3:
-            with open(os.path.join(main_folder.path_data, file_a3.name), "wb") as f:
-                f.write(file_a3.getbuffer())
-            with open(os.path.join(main_folder.path_data, file_b3.name), "wb") as f:
-                f.write(file_b3.getbuffer())
-            pairs_to_process["Pair_3"] = [file_a3.name, file_b3.name]
-
-        if len(pairs_to_process) > 0:
-            st.session_state.data_list_by_pair = pairs_to_process
+        for idx in range(1, n_sessions + 1):
+            file_a = st.session_state.get(f"file_a{idx}")
+            file_b = st.session_state.get(f"file_b{idx}")
+            if file_a and file_b:
+                with open(os.path.join(main_folder.path_data, file_a.name), "wb") as f:
+                    f.write(file_a.getbuffer())
+                with open(os.path.join(main_folder.path_data, file_b.name), "wb") as f:
+                    f.write(file_b.getbuffer())
+                pairs_to_process[f"Pair_{idx}"] = [file_a.name, file_b.name]
+        st.session_state.data_list_by_pair = pairs_to_process
 
     # Display status
     if len(st.session_state.data_list_by_pair) > 0:
-        st.info(f"File siap untuk diproses: " + ", ".join([f"{k}: {v}" for k, v in st.session_state.data_list_by_pair.items()]))
+        st.info("File siap untuk diproses: " + ", ".join([f"{k}: {v[0]} & {v[1]}" for k, v in st.session_state.data_list_by_pair.items()]))
     else:
         st.warning("Silakan unggah set data minimal 1 sesi atau gunakan Data Demo.")
 
@@ -863,7 +901,7 @@ with tab_processing:
                 ))
                 
                 # Optional: Plot individual pair averages in distinct colors for comparison
-                colors_list = ['#FF4B4B', '#3B82F6', '#10B981'] # Red, Blue, Green
+                colors_list = px.colors.qualitative.Plotly # Plotly sequence has 10 distinct colors
                 for idx_pair, (pair_name, pair_avg) in enumerate(sorted(pair_averages.items())):
                     color = colors_list[idx_pair % len(colors_list)]
                     fig_spac.add_trace(go.Scatter(
