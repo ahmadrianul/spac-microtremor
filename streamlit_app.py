@@ -481,71 +481,67 @@ with tab_teori:
         col_diag1, col_diag2 = st.columns(2)
         with col_diag1:
             st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>A. Geometri Segitiga Sama Sisi (3 Sesi)</div>", unsafe_allow_html=True)
-            st.markdown("""
-                <div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
-                    <svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Triangle Lines -->
-                        <line x1="100" y1="15" x2="35" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
-                        <line x1="100" y1="15" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
-                        <line x1="35" y1="128" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
-                        <!-- Radius lines (dashed) -->
-                        <line x1="100" y1="90" x2="100" y2="15" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <line x1="100" y1="90" x2="35" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <line x1="100" y1="90" x2="165" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <!-- Center Node A -->
-                        <circle cx="100" cy="90" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
-                        <text x="100" y="93.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
-                        <!-- Top Vertex B1 -->
-                        <circle cx="100" cy="15" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="100" y="18.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
-                        <!-- Bottom-Left Vertex B3 -->
-                        <circle cx="35" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="35" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
-                        <!-- Bottom-Right Vertex B2 -->
-                        <circle cx="165" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="165" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
-                        <!-- Radius Text -->
-                        <text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
-                    </svg>
-                </div>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
+<svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+<!-- Triangle Lines -->
+<line x1="100" y1="15" x2="35" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+<line x1="100" y1="15" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+<line x1="35" y1="128" x2="165" y2="128" stroke="#FF4B4B" stroke-width="3.5" stroke-linecap="round" />
+<!-- Radius lines (dashed) -->
+<line x1="100" y1="90" x2="100" y2="15" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<line x1="100" y1="90" x2="35" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<line x1="100" y1="90" x2="165" y2="128" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<!-- Center Node A -->
+<circle cx="100" cy="90" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
+<text x="100" y="93.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
+<!-- Top Vertex B1 -->
+<circle cx="100" cy="15" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="100" y="18.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
+<!-- Bottom-Left Vertex B3 -->
+<circle cx="35" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="35" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
+<!-- Bottom-Right Vertex B2 -->
+<circle cx="165" cy="128" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="165" y="131.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
+<!-- Radius Text -->
+<text x="100" y="155" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
+</svg>
+</div>""", unsafe_allow_html=True)
             
         with col_diag2:
             st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>B. Geometri Lingkaran Umum (N Sesi)</div>", unsafe_allow_html=True)
-            st.markdown("""
-                <div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
-                    <svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Circular track (dashed) -->
-                        <circle cx="100" cy="85" r="60" fill="none" stroke="#FF4B4B" stroke-width="2.5" stroke-dasharray="5,5" />
-                        <!-- Radius lines (dashed) -->
-                        <line x1="100" y1="85" x2="100" y2="25" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <line x1="100" y1="85" x2="157" y2="66" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <line x1="100" y1="85" x2="135" y2="134" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <line x1="100" y1="85" x2="65" y2="134" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <line x1="100" y1="85" x2="43" y2="66" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
-                        <!-- Center Node A -->
-                        <circle cx="100" cy="85" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
-                        <text x="100" y="88.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
-                        <!-- Perimeter Nodes B1 to Bn -->
-                        <circle cx="100" cy="25" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="100" y="28.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
-                        
-                        <circle cx="157" cy="66" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="157" y="69.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
-                        
-                        <circle cx="135" cy="134" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="135" y="137.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
-                        
-                        <circle cx="65" cy="134" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="65" y="137.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B4</text>
-                        
-                        <circle cx="43" cy="66" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
-                        <text x="43" y="69.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">Bn</text>
-                        <!-- Radius Text -->
-                        <text x="100" y="160" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
-                    </svg>
-                </div>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
+<svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+<!-- Circular track (dashed) -->
+<circle cx="100" cy="85" r="60" fill="none" stroke="#FF4B4B" stroke-width="2.5" stroke-dasharray="5,5" />
+<!-- Radius lines (dashed) -->
+<line x1="100" y1="85" x2="100" y2="25" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<line x1="100" y1="85" x2="157" y2="66" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<line x1="100" y1="85" x2="135" y2="134" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<line x1="100" y1="85" x2="65" y2="134" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<line x1="100" y1="85" x2="43" y2="66" stroke="#4B5563" stroke-width="1.5" stroke-dasharray="4,4" />
+<!-- Center Node A -->
+<circle cx="100" cy="85" r="9" fill="#FFFFFF" stroke="#111827" stroke-width="3" />
+<text x="100" y="88.5" font-family="'Inter', sans-serif" font-size="10" font-weight="900" text-anchor="middle" fill="#111827">A</text>
+<!-- Perimeter Nodes B1 to Bn -->
+<circle cx="100" cy="25" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="100" y="28.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B1</text>
+
+<circle cx="157" cy="66" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="157" y="69.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B2</text>
+
+<circle cx="135" cy="134" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="135" y="137.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B3</text>
+
+<circle cx="65" cy="134" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="65" y="137.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">B4</text>
+
+<circle cx="43" cy="66" r="9" fill="#FFFFFF" stroke="#FF4B4B" stroke-width="3" />
+<text x="43" y="69.5" font-family="'Inter', sans-serif" font-size="9" font-weight="900" text-anchor="middle" fill="#FF4B4B">Bn</text>
+<!-- Radius Text -->
+<text x="100" y="160" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#4B5563">Radius (r)</text>
+</svg>
+</div>""", unsafe_allow_html=True)
             
         st.markdown(r"""
             ##### B. Parameter Akuisisi Data Lapangan
