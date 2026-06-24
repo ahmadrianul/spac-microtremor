@@ -762,7 +762,7 @@ with tab_input:
                             )
                             sel_a_idx = options_a.index(selected_a)
                         
-                        with st.expander("🔍 Preview Waveform A", expanded=False):
+                        with st.expander("Preview Waveform A", expanded=False):
                             plot_trace_preview(stream_a[sel_a_idx], f"Sinyal A (Sesi {idx})")
                 
                 file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed", "txt", "asc", "dat", "csv"], key=f"file_b{idx}")
@@ -779,7 +779,7 @@ with tab_input:
                             )
                             sel_b_idx = options_b.index(selected_b)
                         
-                        with st.expander(f"🔍 Preview Waveform B{idx}", expanded=False):
+                        with st.expander(f"Preview Waveform B{idx}", expanded=False):
                             plot_trace_preview(stream_b[sel_b_idx], f"Sinyal B{idx} (Sesi {idx})")
 
     st.markdown("---")
