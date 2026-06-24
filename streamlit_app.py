@@ -209,6 +209,90 @@ def plot_coherence_grid_for_pair(pair_name, wins, path_processing):
     st.pyplot(fig)
     plt.close(fig)
 
+def load_uploaded_file_as_stream(uploaded_file, fs):
+    import io
+    import obspy
+    import numpy as np
+    from obspy import Trace, Stream
+    from obspy.core import UTCDateTime
+    
+    file_bytes = uploaded_file.getvalue()
+    filename = uploaded_file.name.lower()
+    
+    is_ascii = any(filename.endswith(ext) for ext in [".txt", ".asc", ".dat", ".csv"])
+    
+    if is_ascii:
+        try:
+            content = file_bytes.decode("utf-8")
+            lines = content.strip().split("\n")
+            data_values = []
+            for line in lines:
+                line = line.strip()
+                if not line or line.startswith("#") or line.startswith(";"):
+                    continue
+                parts = line.replace(",", " ").split()
+                if not parts:
+                    continue
+                try:
+                    if len(parts) >= 2:
+                        val = float(parts[1])
+                    else:
+                        val = float(parts[0])
+                    data_values.append(val)
+                except ValueError:
+                    continue
+            
+            if len(data_values) > 0:
+                data_array = np.array(data_values, dtype=np.float32)
+                tr = Trace(data=data_array)
+                tr.stats.sampling_rate = fs
+                tr.stats.station = 'ASCII'
+                tr.stats.channel = 'Z'
+                tr.stats.network = 'XX'
+                tr.stats.starttime = UTCDateTime(0)
+                return Stream(traces=[tr])
+        except Exception:
+            pass
+
+    try:
+        mem_file = io.BytesIO(file_bytes)
+        stream = obspy.read(mem_file)
+        return stream
+    except Exception as ex:
+        # Fallback to ASCII parsing
+        try:
+            content = file_bytes.decode("utf-8")
+            lines = content.strip().split("\n")
+            data_values = []
+            for line in lines:
+                line = line.strip()
+                if not line or line.startswith("#") or line.startswith(";"):
+                    continue
+                parts = line.replace(",", " ").split()
+                if not parts:
+                    continue
+                try:
+                    if len(parts) >= 2:
+                        val = float(parts[1])
+                    else:
+                        val = float(parts[0])
+                    data_values.append(val)
+                except ValueError:
+                    continue
+            if len(data_values) > 0:
+                data_array = np.array(data_values, dtype=np.float32)
+                tr = Trace(data=data_array)
+                tr.stats.sampling_rate = fs
+                tr.stats.station = 'ASCII'
+                tr.stats.channel = 'Z'
+                tr.stats.network = 'XX'
+                tr.stats.starttime = UTCDateTime(0)
+                return Stream(traces=[tr])
+        except Exception:
+            pass
+        st.error(f"Gagal membaca file `{uploaded_file.name}`. Format tidak dikenali atau file rusak.")
+        return None
+
 # --- Page Configuration ---
 st.set_page_config(
     page_title="SPAC Dispersion Extractor",
@@ -314,6 +398,19 @@ st.session_state.main_folder_path = working_dir
 radius = st.sidebar.number_input("Jarak Radius Array (m)", min_value=0.1, value=4.62, step=0.01)
 fs = st.sidebar.number_input("Sampling Rate (Hz)", min_value=1.0, value=100.0, step=1.0)
 smooth_constant = st.sidebar.number_input("Konstanta Smoothing Spektral", min_value=5, value=100, step=5)
+smoothing_type = st.sidebar.selectbox(
+    "Tipe Smoothing Spektral",
+    options=["Boxcar (Rata-rata Bergerak)", "Parzen", "Konno-Ohmachi"],
+    index=0
+)
+
+# Map smoothing type to backend argument
+if smoothing_type == "Boxcar (Rata-rata Bergerak)":
+    smooth_type_arg = "Boxcar"
+elif smoothing_type == "Parzen":
+    smooth_type_arg = "Parzen"
+else:
+    smooth_type_arg = "Konno-Ohmachi"
 
 # Selection of window size
 window_power = st.sidebar.slider("Ukuran Jendela (2^N)", min_value=10, max_value=16, value=13)
@@ -633,8 +730,28 @@ with tab_input:
             with col:
                 st.markdown(f"### Sesi {idx} (A - B{idx})")
                 st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
-                file_a = st.file_uploader(f"Upload Pusat A Sesi {idx}", type=["sac", "mseed"], key=f"file_a{idx}")
-                file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed"], key=f"file_b{idx}")
+                
+                file_a = st.file_uploader(f"Upload Pusat A Sesi {idx}", type=["sac", "mseed", "txt", "asc", "dat", "csv"], key=f"file_a{idx}")
+                if file_a:
+                    stream_a = load_uploaded_file_as_stream(file_a, fs)
+                    if stream_a and len(stream_a) > 1:
+                        options_a = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_a)]
+                        st.selectbox(
+                            f"Pilih Saluran A Sesi {idx}",
+                            options=options_a,
+                            key=f"trace_a_sel{idx}"
+                        )
+                
+                file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed", "txt", "asc", "dat", "csv"], key=f"file_b{idx}")
+                if file_b:
+                    stream_b = load_uploaded_file_as_stream(file_b, fs)
+                    if stream_b and len(stream_b) > 1:
+                        options_b = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_b)]
+                        st.selectbox(
+                            f"Pilih Saluran B{idx} Sesi {idx}",
+                            options=options_b,
+                            key=f"trace_b_sel{idx}"
+                        )
 
     st.markdown("---")
     
@@ -678,11 +795,48 @@ with tab_input:
             file_a = st.session_state.get(f"file_a{idx}")
             file_b = st.session_state.get(f"file_b{idx}")
             if file_a and file_b:
-                with open(os.path.join(main_folder.path_data, file_a.name), "wb") as f:
-                    f.write(file_a.getbuffer())
-                with open(os.path.join(main_folder.path_data, file_b.name), "wb") as f:
-                    f.write(file_b.getbuffer())
-                pairs_to_process[f"Pair_{idx}"] = [file_a.name, file_b.name]
+                stream_a = load_uploaded_file_as_stream(file_a, fs)
+                stream_b = load_uploaded_file_as_stream(file_b, fs)
+                
+                if stream_a and stream_b:
+                    # Get selected index for A
+                    sel_a_idx = 0
+                    if len(stream_a) > 1:
+                        sel_option_a = st.session_state.get(f"trace_a_sel{idx}")
+                        if sel_option_a:
+                            sel_a_idx = int(sel_option_a.split(":")[0].split()[-1])
+                    
+                    # Get selected index for B
+                    sel_b_idx = 0
+                    if len(stream_b) > 1:
+                        sel_option_b = st.session_state.get(f"trace_b_sel{idx}")
+                        if sel_option_b:
+                            sel_b_idx = int(sel_option_b.split(":")[0].split()[-1])
+                    
+                    # Generate standardized names
+                    name_a = f"sesi_{idx}_A.sac"
+                    name_b = f"sesi_{idx}_B.sac"
+                    
+                    dest_path_a = os.path.join(main_folder.path_data, name_a)
+                    dest_path_b = os.path.join(main_folder.path_data, name_b)
+                    
+                    # Write trace A as SAC
+                    tr_a = stream_a[sel_a_idx]
+                    if not tr_a.stats.network: tr_a.stats.network = 'XX'
+                    if not tr_a.stats.station: tr_a.stats.station = f'S{idx}A'
+                    if not tr_a.stats.channel: tr_a.stats.channel = 'Z'
+                    tr_a.stats.sampling_rate = fs
+                    tr_a.write(dest_path_a, format="SAC")
+                    
+                    # Write trace B as SAC
+                    tr_b = stream_b[sel_b_idx]
+                    if not tr_b.stats.network: tr_b.stats.network = 'XX'
+                    if not tr_b.stats.station: tr_b.stats.station = f'S{idx}B'
+                    if not tr_b.stats.channel: tr_b.stats.channel = 'Z'
+                    tr_b.stats.sampling_rate = fs
+                    tr_b.write(dest_path_b, format="SAC")
+                    
+                    pairs_to_process[f"Pair_{idx}"] = [name_a, name_b]
         st.session_state.data_list_by_pair = pairs_to_process
 
     # Display status
@@ -755,7 +909,7 @@ with tab_processing:
                         # Calculate complex coherence for each window
                         for win_idx in range(1, n_windows + 1):
                             spac_coefficient = complexcoherence.ComplexCoherence(
-                                main_folder, data_windowing, fs=fs, smooth_constant=smooth_constant
+                                main_folder, data_windowing, fs=fs, smooth_constant=smooth_constant, smoothing_type=smooth_type_arg
                             )
                             # calculate coherence
                             f, coh = spac_coefficient.calculate_coherence(files[0], files[1], window_no=win_idx)
