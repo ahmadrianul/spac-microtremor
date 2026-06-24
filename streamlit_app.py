@@ -293,6 +293,36 @@ def load_uploaded_file_as_stream(uploaded_file, fs):
         st.error(f"Gagal membaca file `{uploaded_file.name}`. Format tidak dikenali atau file rusak.")
         return None
 
+def plot_trace_preview(trace, title):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    data = trace.data
+    npts = len(data)
+    fs = trace.stats.sampling_rate
+    times = np.arange(npts) / fs
+    
+    # Decimate data for preview to make it render instantly
+    max_pts = 1000
+    if npts > max_pts:
+        step = npts // max_pts
+        preview_data = data[::step]
+        preview_times = times[::step]
+    else:
+        preview_data = data
+        preview_times = times
+        
+    fig, ax = plt.subplots(figsize=(6, 1.8))
+    ax.plot(preview_times, preview_data, color="#FF4B4B", linewidth=0.6, alpha=0.9)
+    ax.set_title(title, fontsize=8, fontweight="bold", pad=4)
+    ax.set_xlabel("Waktu (s)", fontsize=7, labelpad=2)
+    ax.set_ylabel("Amplitudo", fontsize=7, labelpad=2)
+    ax.tick_params(axis='both', which='major', labelsize=7, pad=1)
+    ax.grid(True, linestyle=":", alpha=0.5)
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
+
 # --- Page Configuration ---
 st.set_page_config(
     page_title="SPAC Dispersion Extractor",
@@ -719,26 +749,38 @@ with tab_input:
                 st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
                 
                 file_a = st.file_uploader(f"Upload Pusat A Sesi {idx}", type=["sac", "mseed", "txt", "asc", "dat", "csv"], key=f"file_a{idx}")
+                sel_a_idx = 0
                 if file_a:
                     stream_a = load_uploaded_file_as_stream(file_a, fs)
-                    if stream_a and len(stream_a) > 1:
-                        options_a = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_a)]
-                        st.selectbox(
-                            f"Pilih Saluran A Sesi {idx}",
-                            options=options_a,
-                            key=f"trace_a_sel{idx}"
-                        )
+                    if stream_a:
+                        if len(stream_a) > 1:
+                            options_a = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_a)]
+                            selected_a = st.selectbox(
+                                f"Pilih Saluran A Sesi {idx}",
+                                options=options_a,
+                                key=f"trace_a_sel{idx}"
+                            )
+                            sel_a_idx = options_a.index(selected_a)
+                        
+                        with st.expander("🔍 Preview Waveform A", expanded=False):
+                            plot_trace_preview(stream_a[sel_a_idx], f"Sinyal A (Sesi {idx})")
                 
                 file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed", "txt", "asc", "dat", "csv"], key=f"file_b{idx}")
+                sel_b_idx = 0
                 if file_b:
                     stream_b = load_uploaded_file_as_stream(file_b, fs)
-                    if stream_b and len(stream_b) > 1:
-                        options_b = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_b)]
-                        st.selectbox(
-                            f"Pilih Saluran B{idx} Sesi {idx}",
-                            options=options_b,
-                            key=f"trace_b_sel{idx}"
-                        )
+                    if stream_b:
+                        if len(stream_b) > 1:
+                            options_b = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_b)]
+                            selected_b = st.selectbox(
+                                f"Pilih Saluran B{idx} Sesi {idx}",
+                                options=options_b,
+                                key=f"trace_b_sel{idx}"
+                            )
+                            sel_b_idx = options_b.index(selected_b)
+                        
+                        with st.expander(f"🔍 Preview Waveform B{idx}", expanded=False):
+                            plot_trace_preview(stream_b[sel_b_idx], f"Sinyal B{idx} (Sesi {idx})")
 
     st.markdown("---")
     
