@@ -398,19 +398,6 @@ st.session_state.main_folder_path = working_dir
 radius = st.sidebar.number_input("Jarak Radius Array (m)", min_value=0.1, value=4.62, step=0.01)
 fs = st.sidebar.number_input("Sampling Rate (Hz)", min_value=1.0, value=100.0, step=1.0)
 smooth_constant = st.sidebar.number_input("Konstanta Smoothing Spektral", min_value=5, value=100, step=5)
-smoothing_type = st.sidebar.selectbox(
-    "Tipe Smoothing Spektral",
-    options=["Boxcar (Rata-rata Bergerak)", "Parzen", "Konno-Ohmachi"],
-    index=0
-)
-
-# Map smoothing type to backend argument
-if smoothing_type == "Boxcar (Rata-rata Bergerak)":
-    smooth_type_arg = "Boxcar"
-elif smoothing_type == "Parzen":
-    smooth_type_arg = "Parzen"
-else:
-    smooth_type_arg = "Konno-Ohmachi"
 
 # Selection of window size
 window_power = st.sidebar.slider("Ukuran Jendela (2^N)", min_value=10, max_value=16, value=13)
@@ -909,7 +896,7 @@ with tab_processing:
                         # Calculate complex coherence for each window
                         for win_idx in range(1, n_windows + 1):
                             spac_coefficient = complexcoherence.ComplexCoherence(
-                                main_folder, data_windowing, fs=fs, smooth_constant=smooth_constant, smoothing_type=smooth_type_arg
+                                main_folder, data_windowing, fs=fs, smooth_constant=smooth_constant
                             )
                             # calculate coherence
                             f, coh = spac_coefficient.calculate_coherence(files[0], files[1], window_no=win_idx)
