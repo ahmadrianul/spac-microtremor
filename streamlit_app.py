@@ -1004,13 +1004,18 @@ with tab_processing:
                     plot_coherence_grid_for_pair(pair_name, wins, os.path.join(working_dir, "processing"))
 
             st.write("Atur parameter filter dan lakukan seleksi jendela untuk stacking di bawah ini:")
-            with st.form("qc_selection_form"):
-                # Settings for Similarity Threshold
-                st.write("**Parameter Saran Window Otomatis**")
+            
+            # Parameter Saran Window Otomatis moved outside st.form so that adjustments trigger real-time updates
+            st.write("**Parameter Saran Window Otomatis**")
+            col_param1, col_param2, col_param3 = st.columns(3)
+            with col_param1:
                 std_threshold = st.slider("Tingkat Ketatnya Seleksi (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
+            with col_param2:
                 f_min_check = st.number_input("Rentang Frekuensi Min (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
+            with col_param3:
                 f_max_check = st.number_input("Rentang Frekuensi Max (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
 
+            with st.form("qc_selection_form"):
                 st.markdown("---")
                 selected_pairs_win = {}
                 
