@@ -770,7 +770,7 @@ with tab_input:
                 st.markdown(f"### Sesi {idx} (A - B{idx})")
                 st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
                 
-                file_a = st.file_uploader(f"Upload Pusat A Sesi {idx}", type=["sac", "mseed", "txt", "asc", "dat", "csv"], key=f"file_a{idx}")
+                file_a = st.file_uploader(f"Upload Pusat A Sesi {idx}", type=["sac", "mseed", "miniseed", "msd", "txt", "asc", "dat", "csv"], key=f"file_a{idx}")
                 sel_a_idx = 0
                 if file_a:
                     stream_a = load_uploaded_file_as_stream(file_a, fs)
@@ -787,7 +787,7 @@ with tab_input:
                         with st.expander("Preview Waveform A", expanded=False):
                             plot_trace_preview(stream_a[sel_a_idx], f"Sinyal A (Sesi {idx})")
                 
-                file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed", "txt", "asc", "dat", "csv"], key=f"file_b{idx}")
+                file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed", "miniseed", "msd", "txt", "asc", "dat", "csv"], key=f"file_b{idx}")
                 sel_b_idx = 0
                 if file_b:
                     stream_b = load_uploaded_file_as_stream(file_b, fs)
