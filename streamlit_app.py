@@ -254,11 +254,33 @@ def load_uploaded_file_as_stream(uploaded_file, fs):
         except Exception:
             pass
 
+    # Guess format from extension
+    fmt = None
+    if filename.endswith(".sac"):
+        fmt = "SAC"
+    elif any(filename.endswith(ext) for ext in [".mseed", ".miniseed", ".msd"]):
+        fmt = "MSEED"
+
     try:
         mem_file = io.BytesIO(file_bytes)
-        stream = obspy.read(mem_file)
+        stream = obspy.read(mem_file, format=fmt)
         return stream
     except Exception as ex:
+        # Try alternate format
+        try:
+            mem_file = io.BytesIO(file_bytes)
+            other_fmt = "MSEED" if fmt == "SAC" else "SAC"
+            stream = obspy.read(mem_file, format=other_fmt)
+            return stream
+        except Exception:
+            # Try autodetect
+            try:
+                mem_file = io.BytesIO(file_bytes)
+                stream = obspy.read(mem_file)
+                return stream
+            except Exception:
+                pass
+                
         # Fallback to ASCII parsing
         try:
             content = file_bytes.decode("utf-8")
