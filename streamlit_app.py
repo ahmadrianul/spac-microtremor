@@ -426,7 +426,7 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
-st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Aplikasi Web Interaktif untuk Ekstraksi Kurva Dispersi Kecepatan Fase (Metode SPAC Sekuensial)</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle" style="text-align: center; margin-top: -1rem;">Interactive Web Application for Phase Velocity Dispersion Curve Extraction (Sequential SPAC Method)</div>', unsafe_allow_html=True)
 
 # --- Session State Initialization ---
 if "session_id" not in st.session_state:
@@ -442,23 +442,23 @@ if "main_folder_path" not in st.session_state:
     st.session_state.main_folder_path = os.path.join("./workspace", st.session_state.session_id)
 
 # --- Sidebar Parameter Inputs ---
-st.sidebar.header("Parameter Pemrosesan")
+st.sidebar.header("Processing Parameters")
 
-working_dir = st.sidebar.text_input("Folder Direktori Kerja (Terisolasi per Sesi)", value=st.session_state.main_folder_path)
+working_dir = st.sidebar.text_input("Working Directory Folder (Session-Isolated)", value=st.session_state.main_folder_path)
 st.session_state.main_folder_path = working_dir
 
-radius = st.sidebar.number_input("Jarak Radius Array (m)", min_value=0.1, value=4.62, step=0.01)
+radius = st.sidebar.number_input("Array Radius (m)", min_value=0.1, value=4.62, step=0.01)
 fs = st.sidebar.number_input("Sampling Rate (Hz)", min_value=1.0, value=100.0, step=1.0)
-smooth_constant = st.sidebar.number_input("Konstanta Smoothing Spektral", min_value=5, value=100, step=5)
+smooth_constant = st.sidebar.number_input("Spectral Smoothing Constant", min_value=5, value=100, step=5)
 
 # Selection of window size
-window_power = st.sidebar.slider("Ukuran Jendela (2^N)", min_value=10, max_value=16, value=13)
+window_power = st.sidebar.slider("Window Size (2^N)", min_value=10, max_value=16, value=13)
 window_size = 2**window_power
-st.sidebar.caption(f"Panjang Jendela: {window_size} sampel ({window_size/fs:.2f} detik)")
+st.sidebar.caption(f"Window Length: {window_size} samples ({window_size/fs:.2f} seconds)")
 
-decimation_factor = st.sidebar.number_input("Faktor Desimasi Fitting", min_value=1, value=10, step=1)
-min_pv = st.sidebar.number_input("Batas Min Kecepatan Fase (m/s)", min_value=10.0, value=100.0, step=10.0)
-max_pv = st.sidebar.number_input("Batas Max Kecepatan Fase (m/s)", min_value=50.0, value=1000.0, step=10.0)
+decimation_factor = st.sidebar.number_input("Fitting Decimation Factor", min_value=1, value=10, step=1)
+min_pv = st.sidebar.number_input("Min Phase Velocity Limit (m/s)", min_value=10.0, value=100.0, step=10.0)
+max_pv = st.sidebar.number_input("Max Phase Velocity Limit (m/s)", min_value=50.0, value=1000.0, step=10.0)
 
 # --- Initialize Environment ---
 @st.cache_resource
@@ -468,157 +468,149 @@ def get_environment(path):
 try:
     main_folder = get_environment(working_dir)
 except Exception as e:
-    st.error(f"Gagal menginisialisasi folder kerja: {e}")
+    st.error(f"Failed to initialize working directory: {e}")
     st.stop()
 
 # --- Main Layout Tabs ---
-tab_teori, tab_input, tab_processing, tab_output = st.tabs(["Teori & Panduan", "Input Data & Sesi", "Pemrosesan & Quality Control", "Kurva Dispersi"])
-
+tab_teori, tab_input, tab_processing, tab_output = st.tabs(["Theory & Guidelines", "Data Input & Sessions", "Processing & Quality Control", "Dispersion Curve"])
 # ==========================================
 # TAB 0: TEORI & PANDUAN
 # ==========================================
 with tab_teori:
-    st.markdown("### Modul Teori & Panduan Metode SPAC Sekuensial")
-    st.write("Silakan pilih topik penjelasan ilmiah di bawah ini untuk mempelajari lebih lanjut tentang metode SPAC, formulasi matematis, desain akuisisi, alur pengolahan, dan jurnal pendukung:")
+    st.markdown("### Theoretical Module & Guidelines for the Sequential SPAC Method")
+    st.write("Select a scientific topic below to learn more about the Spatial Autocorrelation (SPAC) method, its mathematical formulation, acquisition design, processing workflow, and supporting literature:")
     
     topik = st.selectbox(
-        "Pilih Topik Penjelasan:",
+        "Select Explanation Topic:",
         options=[
-            "1. Pengantar & Konsep Dasar SPAC",
-            "2. Formulasi Matematis & Rumus",
-            "3. Desain Akuisisi Data Sekuensial (Two-Station)",
-            "4. Alur Pengolahan Data (Step-by-Step)",
-            "5. Dukungan Artikel & Jurnal Ilmiah",
-            "6. Ucapan Terima Kasih"
+            "1. Introduction & Fundamental Concepts of SPAC",
+            "2. Mathematical Formulation & Equations",
+            "3. Sequential Data Acquisition Design (Two-Station)",
+            "4. Data Processing Workflow (Step-by-Step)",
+            "5. Supporting Literature & Scientific Journals",
+            "6. Acknowledgments"
         ],
         key="topik_teori"
     )
     
     st.markdown("---")
     
-    if topik == "1. Pengantar & Konsep Dasar SPAC":
+    if topik == "1. Introduction & Fundamental Concepts of SPAC":
         st.markdown(r"""
-            #### 1. Pengantar & Konsep Dasar SPAC (Spatial Autocorrelation)
+            #### 1. Introduction & Fundamental Concepts of SPAC (Spatial Autocorrelation)
             
-            Metode Spatial Autocorrelation (SPAC) merupakan salah satu metode geofisika pasif non-invasif yang sangat populer digunakan untuk mengestimasi struktur kecepatan gelombang geser ($V_s$) satu dimensi (1D) bawah permukaan.
+            The Spatial Autocorrelation (SPAC) method is a popular passive, non-invasive geophysical method used to estimate the one-dimensional (1D) shear wave velocity ($V_s$) structure of the subsurface.
             
-            ##### A. Prinsip Dasar
-            Berbeda dengan metode seismik aktif tradisional (seperti MASW atau seismik refraksi) yang memerlukan sumber getaran buatan seperti palu godam (*sledgehammer*) atau peledak, metode SPAC memanfaatkan getaran alami bumi yang dikenal sebagai ambient noise atau mikrotremor. Getaran ini bersumber dari:
-            *   **Aktivitas Alam:** Gelombang laut, pergerakan angin, interaksi atmosfer, aktivitas tektonik mikro.
-            *   **Aktivitas Manusia:** Lalu lintas kendaraan, getaran mesin pabrik/industri, langkah kaki manusia, dan aktivitas perkotaan lainnya.
+            ##### A. Fundamental Principles
+            Unlike traditional active seismic methods (such as MASW or seismic refraction) which require artificial seismic sources like a sledgehammer or explosives, the SPAC method utilizes natural earth vibrations known as ambient noise or microtremors. These vibrations originate from:
+            *   **Natural Activities:** Ocean waves, wind interactions, atmospheric variations, and microtectonic activities.
+            *   **Human Activities:** Traffic, factory/industrial machinery, human footsteps, and other urban activities.
             
-            Mikrotremor ini didominasi oleh gelombang permukaan (terutama gelombang Rayleigh) yang merambat secara horizontal di dekat permukaan bumi.
+            These microtremors are dominated by surface waves (mainly Rayleigh waves) that propagate horizontally near the Earth's surface.
             
-            ##### B. Keunggulan Metode SPAC
-            1.  **Non-Invasif & Non-Destruktif:** Tidak memerlukan pengeboran lubang bor (seperti pada metode SPT atau downhole/crosshole) yang mahal dan dapat merusak permukaan tanah, sehingga sangat ramah lingkungan.
-            2.  **Sangat Cocok untuk Kawasan Perkotaan (Urban Areas):** Di area padat penduduk, sangat sulit untuk membangkitkan getaran buatan berenergi besar (seperti dinamit atau palu). SPAC justru memanfaatkan kebisingan kota tersebut sebagai sumber sinyalnya.
-            3.  **Investigasi Lebih Dalam:** Karena memanfaatkan gelombang permukaan frekuensi rendah dari ambient noise global, SPAC mampu mencapai kedalaman investigasi yang jauh lebih besar (dari puluhan hingga ratusan meter) dibandingkan metode aktif berenergi rendah.
-            4.  **Ekonomis & Praktis:** Mengurangi biaya operasional lapangan dan mempermudah mobilisasi peralatan di area dengan topografi yang sulit.
+            ##### B. Key Advantages of the SPAC Method
+            1.  **Non-Invasive & Non-Destructive:** Does not require borehole drilling (unlike SPT or downhole/crosshole methods), making it cost-effective and environmentally friendly.
+            2.  **Highly Suitable for Urban Areas:** In densely populated areas, generating high-energy artificial vibrations (such as dynamites or hammers) is challenging. SPAC turns urban noise into a useful signal source.
+            3.  **Deeper Investigation Depth:** By leveraging low-frequency surface waves from global ambient noise, SPAC can achieve significantly greater depths of investigation (ranging from tens to hundreds of meters) compared to active low-energy source methods.
+            4.  **Cost-Effective & Practical:** Minimizes field operational costs and simplifies equipment logistics in challenging terrains.
             
-            ##### C. Sejarah Singkat
-            Teori Spatial Autocorrelation pertama kali diformulasikan secara matematis oleh geofisikawan Jepang, Keiiti Aki (1957). Beliau membuktikan secara matematis bahwa korelasi statistik dari getaran ambient noise yang direkam secara simultan pada beberapa stasiun penerima dapat digunakan untuk mengekstrak kurva dispersi gelombang permukaan. Teori ini kemudian dikembangkan dan disempurnakan menjadi metode praktis siap pakai untuk eksplorasi oleh Hiroshi Okada (2003) melalui bukunya yang terkenal, *"The Microtremor Survey Method"*.
+            ##### C. Brief History
+            The theory of Spatial Autocorrelation was first mathematically formulated by Japanese geophysicist Keiiti Aki (1957). He proved that the statistical correlation of ambient noise recorded simultaneously at multiple receiving stations can be used to extract the dispersion curve of surface waves. This theory was later developed and refined into a practical exploration tool by Hiroshi Okada (2003) in his renowned book, *"The Microtremor Survey Method"*.
         """)
         
-    elif topik == "2. Formulasi Matematis & Rumus":
+    elif topik == "2. Mathematical Formulation & Equations":
         st.markdown(r"""
-            #### 2. Formulasi Matematis & Rumus-Rumus
+            #### 2. Mathematical Formulation & Equations
             
-            Berikut adalah formulasi matematis utama yang melandasi perambatan gelombang seismik, karakter dispersi gelombang Rayleigh, hingga perhitungan koefisien SPAC untuk mengekstrak kecepatan fase gelombang permukaan:
+            Below are the primary mathematical formulations governing seismic wave propagation, the geometric dispersion character of Rayleigh waves, and the calculation of the SPAC coefficient to extract surface wave phase velocity:
             
-            ##### A. Kecepatan Gelombang Seismik Badan (Body Waves)
-            Gelombang seismik badan merambat melalui interior bumi dan dibedakan menjadi Gelombang P (Primer/Longitudinal) dan Gelombang S (Sekunder/Transversal/Geser):
+            ##### A. Body Wave Velocities
+            Body waves propagate through the Earth's interior and are classified into P-waves (Primary/Longitudinal) and S-waves (Secondary/Transverse/Shear):
         """)
         
         st.latex(r"V_p = \sqrt{\frac{k + \frac{4}{3}\mu}{\rho}}")
         st.latex(r"V_s = \sqrt{\frac{\mu}{\rho}}")
         
         st.markdown(r"""
-            Dimana:
-            *   $V_p$ adalah kecepatan gelombang primer ($m/s$).
-            *   $V_s$ adalah kecepatan gelombang geser ($m/s$).
-            *   $k$ adalah Modulus Bulk medium ($N/m^2$).
-            *   $\mu$ adalah Modulus Geser / Konstanta Lame kedua ($N/m^2$).
-            *   $\rho$ adalah densitas massa medium ($kg/m^3$).
+            Where:
+            *   $V_p$ is the primary wave velocity ($m/s$).
+            *   $V_s$ is the shear wave velocity ($m/s$).
+            *   $k$ is the bulk modulus of the medium ($N/m^2$).
+            *   $\mu$ is the shear modulus / second Lame constant ($N/m^2$).
+            *   $\rho$ is the mass density of the medium ($kg/m^3$).
             
-            ##### B. Kecepatan Gelombang Rayleigh ($V_R$)
-            Gelombang Rayleigh menjalar di sepanjang permukaan bebas bumi dengan lintasan partikel elips retrograde. Pada medium elastis homogen dan isotropis dengan rasio Poisson $\nu = 0.25$, hubungan antara kecepatan gelombang Rayleigh ($V_R$) dan gelombang geser ($V_S$) didekati dengan:
-        """)
-        
-        st.latex(r"V_R \approx 0.92 V_S")
-        
-        st.markdown(r"""
-            ##### C. Karakter Dispersi Geometris Gelombang Rayleigh
-            Gelombang Rayleigh bersifat dispersif pada medium berlapis, di mana komponen gelombang dengan frekuensi berbeda merambat dengan kecepatan fase yang berbeda karena kedalaman penetrasi yang berbeda. Kedalaman penetrasi efektif gelombang sebanding dengan panjang gelombangnya ($\lambda$). Secara matematis hubungan panjang gelombang, kecepatan fase ($c(f)$), dan frekuensi ($f$) dituliskan sebagai:
+            ##### B. Geometric Dispersion Character of Rayleigh Waves
+            Rayleigh waves are dispersive in a layered medium, meaning that wave components with different frequencies propagate at different phase velocities due to their varying penetration depths. The effective penetration depth of a wave is proportional to its wavelength ($\lambda$). Mathematically, the relation between wavelength, phase velocity ($c(f)$), and frequency ($f$) is written as:
         """)
         
         st.latex(r"\lambda = \frac{c(f)}{f}")
         
         st.markdown(r"""
-            *   **Frekuensi Tinggi (Panjang Gelombang Pendek):** Hanya merambat dan terkonsentrasi di lapisan dangkal yang lunak (kecepatan fase $c$ akan rendah).
-            *   **Frekuensi Rendah (Panjang Gelombang Panjang):** Mampu menembus lebih dalam dan dipengaruhi oleh lapisan batuan yang lebih kaku (kecepatan fase $c$ akan tinggi).
+            *   **High Frequencies (Short Wavelengths):** Only propagate and concentrate within shallow, soft layers (resulting in low phase velocity $c$).
+            *   **Low Frequencies (Long Wavelengths):** Penetrate deeper and are influenced by stiffer, deeper rock layers (resulting in high phase velocity $c$).
             
-            ##### D. Transformasi Fourier
-            Untuk menganalisis frekuensi, data gelombang mentah dalam domain waktu-ruang $u(x, t)$ ditransformasikan ke domain frekuensi $U(x, \omega)$ melalui integral:
+            ##### C. Fourier Transform
+            To analyze frequency components, raw wave data in the space-time domain $u(x, t)$ is transformed into the frequency domain $U(x, \omega)$ via the following integral:
         """)
         
         st.latex(r"U(x, \omega) = \int_{-\infty}^{\infty} u(x, t) e^{-j\omega t} dt")
         
         st.markdown(r"""
-            Dimana $\omega = 2\pi f$ adalah frekuensi sudut ($radian/detik$), $t$ adalah waktu ($detik$), dan $j$ adalah bilangan imajiner.
+            Where $\omega = 2\pi f$ is the angular frequency ($rad/s$), $t$ is time ($s$), and $j$ is the imaginary unit.
             
-            ##### E. Fungsi Kompleks Koherensi ($C_{fg}(\omega)$)
-            Koherensi dihitung antar pasangan receiver $f$ and $g$ yang dipisahkan oleh jarak tertentu:
+            ##### D. Complex Coherence Function ($C_{fg}(\omega)$)
+            Coherence is computed between receiver pairs $f$ and $g$ separated by a distance:
         """)
         
         st.latex(r"C_{fg}(\omega) = \frac{CC_{fg}(\omega)}{|U_f(\omega)| \cdot |U_g(\omega)|}")
         
         st.markdown(r"""
-            Di mana $CC_{fg}(\omega) = U_f(\omega) \cdot U_g^*(\omega)$ adalah korelasi silang (*cross-spectral density*) antara spektrum frekuensi tras pertama $U_f(\omega)$ dan konjugat kompleks spektrum tras kedua $U_g^*(\omega)$.
+            Where $CC_{fg}(\omega) = U_f(\omega) \cdot U_g^*(\omega)$ is the cross-spectral density between the spectrum of the first trace $U_f(\omega)$ and the complex conjugate spectrum of the second trace $U_g^*(\omega)$.
             
-            ##### F. Koefisien SPAC Rata-rata Azimuthal ($\rho(f, r)$)
-            Koefisien SPAC diperoleh dengan merata-ratakan nilai koherensi spasial $C(r, \theta, \omega)$ dari segala arah (azimuth $\theta$ dari $0$ hingga $2\pi$):
+            ##### E. Azimuthally Averaged SPAC Coefficient ($\rho(f, r)$)
+            The SPAC coefficient is obtained by averaging the spatial coherence $C(r, \theta, \omega)$ over all directions (azimuth $\theta$ from $0$ to $2\pi$):
         """)
         
         st.latex(r"\rho(f, r) = \frac{1}{2\pi} \int_{0}^{2\pi} C(r, \theta, \omega) d\theta")
         
         st.markdown(r"""
-            ##### G. Pencocokan ke Fungsi Bessel Jenis Pertama Orde Nol ($J_0$)
-            Aki (1957) membuktikan bahwa jika medan gelombang mikrotremor datang secara acak dari segala arah dengan kekuatan seimbang, koefisien SPAC azimuthal rata-rata memiliki hubungan matematis langsung dengan Fungsi Bessel $J_0$:
+            ##### F. Fitting to Zero-Order Bessel Function of the First Kind ($J_0$)
+            Aki (1957) demonstrated that if the ambient noise field arrives randomly from all directions with equal power, the azimuthally averaged SPAC coefficient has a direct mathematical relationship with the Bessel function $J_0$:
         """)
         
         st.latex(r"\rho(f, r) = J_0(kr) = J_0\left(\frac{2\pi f r}{c(f)}\right)")
         
         st.markdown(r"""
-            Dimana $r$ adalah jarak radius antar sensor ($meter$) dan $c(f)$ adalah kecepatan fase gelombang Rayleigh ($m/s$).
+            Where $r$ is the array radius ($m$) and $c(f)$ is the Rayleigh wave phase velocity ($m/s$).
             
-            ##### H. Estimasi Kecepatan Fase ($c(f)$)
-            Dari nilai koefisien SPAC observasi lapangan $\rho(f, r)$ pada setiap frekuensi $f$, kita menyelesaikan persamaan transenden di atas untuk mencari argumen Bessel $x = kr$ (yaitu $x = \frac{2\pi f r}{c(f)}$) menggunakan metode numerik. Setelah nilai $x$ diperoleh, kecepatan fase gelombang Rayleigh dapat diekstrak dengan rumus:
+            ##### G. Phase Velocity Estimation ($c(f)$)
+            From the observed SPAC coefficient $\rho(f, r)$ at each frequency $f$, we solve the transcendental equation above to find the Bessel argument $x = kr$ (i.e., $x = \frac{2\pi f r}{c(f)}$) using numerical methods. Once $x$ is determined, the Rayleigh wave phase velocity can be extracted using the formula:
         """)
         
         st.latex(r"c(f) = \frac{2\pi f r}{x}")
         
-    elif topik == "3. Desain Akuisisi Data Sekuensial (Two-Station)":
+    elif topik == "3. Sequential Data Acquisition Design (Two-Station)":
         st.markdown(r"""
-            #### 3. Desain Akuisisi Data Sekuensial (Two-Station Method)
+            #### 3. Sequential Data Acquisition Design (Two-Station Method)
             
-            Secara konvensional, survei SPAC memerlukan susunan sensor (*array*) melingkar yang merekam secara simultan (misalnya 1 pusat, 3 atau lebih keliling). Namun, konfigurasi tersebut membutuhkan banyak peralatan geofon dan bentangan kabel yang rumit di lapangan.
+            Conventionally, SPAC surveys require a circular sensor array recording simultaneously (e.g., 1 center sensor and 3 or more perimeter sensors). However, this configuration demands multiple geophones and complex cabling in the field.
             
-            ##### A. Konsep Metode Dua Sensor (Two-Station Method)
-            Untuk meningkatkan efisiensi di lapangan, metode SPAC Sekuensial (Two-Station Method) diterapkan dengan hanya menggunakan 2 buah geofon (seperti unit sensor SmartSolo 3C). 
+            ##### A. Concept of the Two-Sensor Method
+            To improve field efficiency, the Sequential SPAC method (Two-Station Method) is applied using only 2 geophones (such as SmartSolo 3C wireless geophone units).
             
-            Sinyal direkam secara bertahap (sekuensial) dengan konfigurasi geometri stasiun geofon sebagai berikut:
-            1.  **Geofon Referensi Tetap (Pusat A):** Diletakkan tetap di titik pusat lingkaran selama seluruh sesi pengukuran.
-            2.  **Geofon Bergerak (Rover B):** Dipindahkan secara berurutan ke stasiun keliling lingkaran pada radius $r$ yang sama di beberapa titik ($B_1, B_2, \dots, B_n$).
+            Signals are recorded sequentially (in stages) with the following geophone geometry configuration:
+            1.  **Fixed Reference Geophone (Center A):** Placed permanently at the center of the circle during all recording sessions.
+            2.  **Mobile Geophone (Rover B):** Moved sequentially to perimeter stations on the same radius $r$ at various points ($B_1, B_2, \dots, B_n$).
             
-            Metode ini dapat diterapkan pada dua jenis susunan geometri utama:
-            *   **Geometri Segitiga Sama Sisi (3 Sesi):** Geofon bergerak dipindahkan ke 3 titik stasiun keliling ($B_1, B_2, B_3$) yang membentuk sudut pisah $120^\circ$ satu sama lain (memerlukan 3 sesi perekaman).
-            *   **Geometri Lingkaran Umum (N Sesi):** Geofon bergerak dipindahkan ke $N$ stasiun keliling lingkaran ($B_1, B_2, \dots, B_n$) untuk memperoleh resolusi azimuthal yang lebih tinggi (memerlukan $N$ sesi perekaman).
+            This method can be implemented in two major array geometries:
+            *   **Equilateral Triangle Geometry (3 Sessions):** The mobile geophone is moved to 3 perimeter stations ($B_1, B_2, B_3$) separated by $120^\circ$ angles (requires 3 recording sessions).
+            *   **General Circular Geometry (N Sessions):** The mobile geophone is moved to $N$ circular perimeter stations ($B_1, B_2, \dots, B_n$) to achieve higher azimuthal resolution (requires $N$ recording sessions).
         """)
         
         # Render both SVG diagrams side-by-side
         col_diag1, col_diag2 = st.columns(2)
         with col_diag1:
-            st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>A. Geometri Segitiga Sama Sisi (3 Sesi)</div>", unsafe_allow_html=True)
+            st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>A. Equilateral Triangle Geometry (3 Sessions)</div>", unsafe_allow_html=True)
             st.markdown("""<div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
 <svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
 <!-- Triangle Lines -->
@@ -647,7 +639,7 @@ with tab_teori:
 </div>""", unsafe_allow_html=True)
             
         with col_diag2:
-            st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>B. Geometri Lingkaran Umum (N Sesi)</div>", unsafe_allow_html=True)
+            st.markdown("<div style='text-align: center; font-weight: bold; margin-bottom: 0.5rem; color: #111827;'>B. General Circular Geometry (N Sessions)</div>", unsafe_allow_html=True)
             st.markdown("""<div style="display: flex; justify-content: center; background-color: #FAFAFA; padding: 1.5rem; border: 2px solid #E5E7EB; border-radius: 8px;">
 <svg width="200" height="170" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
 <!-- Circular track (dashed) -->
@@ -683,61 +675,61 @@ with tab_teori:
             
         st.markdown(r"""
             ##### B. Parameter Akuisisi Data Lapangan
-            *   **Radius Array ($r$):** $r$ (jari-jari stasiun geofon keliling dari pusat).
-            *   **Durasi Perekaman:** minimal 20 menit untuk masing-masing stasiun pasangan (total durasi menyesuaikan jumlah sesi).
-            *   **Sampling Rate:** 100 Hz (diperoleh langsung dari metadata/header file rekaman seismik .sac/.mseed yang diunggah).
-            *   **Sensor Geofon:** Geofon (komponen vertikal).
+            *   **Array Radius ($r$):** $r$ (radius of the perimeter geophone stations from the center).
+            *   **Recording Duration:** minimum of 20 minutes for each station pair (total duration scales with the number of sessions).
+            *   **Sampling Rate:** 100 Hz (retrieved directly from the metadata/header of the uploaded .sac/.mseed seismic records).
+            *   **Geophone Sensor:** Geophone (vertical component).
             
             ##### C. Asumsi Kunci
-            Metode ini sangat bergantung pada asumsi bahwa medan getaran ambient noise bersifat stasioner (karakteristik statistiknya stabil dan tidak berubah) sepanjang total durasi perekaman seluruh sesi tersebut. Rata-rata azimuthal disimulasikan secara numerik saat pemrosesan data dengan merata-ratakan hasil koherensi silang dari semua stasiun pasangan yang direkam secara terpisah tersebut.
+            This method relies heavily on the assumption that the ambient noise wavefield is stationary (its statistical properties remain stable and unchanged) throughout the total duration of all recording sessions. The azimuthal average is simulated numerically during data processing by averaging the cross-coherence results from all station pairs recorded separately.
         """)
         
-    elif topik == "4. Alur Pengolahan Data (Step-by-Step)":
+    elif topik == "4. Data Processing Workflow (Step-by-Step)":
         st.markdown(r"""
-            #### 4. Alur Pengolahan Data (Step-by-Step)
+            #### 4. Data Processing Workflow (Step-by-Step)
             
-            Proses pengolahan data mikrotremor metode SPAC sekuensial dari berkas mentah hingga menjadi kurva dispersi final dilakukan melalui tahapan berikut:
+            The sequential SPAC microtremor data processing workflow from raw files to the final dispersion curve consists of the following steps:
             
-            1.  **Input Data Seismogram:**
-                Membaca file rekaman biner seismik berformat SAC atau MINISEED untuk stasiun referensi (A) dan stasiun keliling (B) untuk seluruh sesi pengukuran (Sesi 1, Sesi 2, ..., Sesi N).
-            2.  **Segmentasi Waktu (Windowing):**
-                Sinyal kontinu berdurasi panjang disegmentasi menjadi sejumlah jendela waktu yang lebih pendek (misalnya panjang jendela sebesar $2^{13} = 8192$ sampel atau setara 81.92 detik pada sampling rate 100 Hz) dengan *overlap* tertentu. Hal ini berguna untuk mengisolasi segmen data yang stasioner dan membuang gangguan transient noise lokal (seperti getaran akibat kendaraan yang lewat sangat dekat).
-            3.  **Transformasi Spektral (FFT):**
-                Setiap jendela waktu dari data domain waktu ditransformasikan ke domain frekuensi menggunakan algoritma Fast Fourier Transform (FFT) guna mendapatkan spektrum amplitudo dan fase sinyal.
-            4.  **Kalkulasi Kompleks Koherensi:**
-                Kompleks koherensi dihitung pada setiap frekuensi untuk setiap jendela waktu pada masing-masing sesi stasiun pasangan (A-B1, A-B2, ..., A-Bn).
-            5.  **Quality Control (QC) & Seleksi Jendela Otomatis:**
-                *   **Evaluasi RMSE:** Aplikasi menghitung selisih (Root Mean Square Error / RMSE) antara nilai koherensi setiap jendela terhadap nilai median koherensi pada rentang frekuensi kontrol (1 - 50 Hz).
-                *   **Saran Window:** Jendela dengan RMSE di bawah batas cutoff (misalnya median + 0.05 standar deviasi) diklasifikasikan sebagai jendela bersih (konsisten), sedangkan jendela dengan RMSE tinggi diklasifikasikan sebagai outlier (noise) dan disarankan untuk dibuang.
-            6.  **Rata-rata Dua Tahap (Two-Stage Stacking):**
-                *   *Tahap 1:* Jendela-jendela yang terpilih di dalam masing-masing sesi dirata-ratakan secara independen untuk mendapatkan kurva koefisien SPAC rata-rata masing-masing sesi ($\rho_1, \rho_2, \dots, \rho_N$).
-                *   *Tahap 2:* Semua kurva rata-rata sesi tersebut kemudian dirata-ratakan secara bersama-sama untuk mendapatkan kurva koefisien SPAC akhir ($\rho_{avg}$). Hal ini penting untuk menjamin pembobotan spasial yang seimbang dari segala arah sensor.
-            7.  **Pencocokan Fungsi Bessel (Bessel Fitting):**
-                Nilai koefisien SPAC rata-rata akhir $\rho_{avg}(f)$ dicocokkan dengan kurva Bessel teoritis $J_0(x)$ menggunakan metode kuadrat terkecil (*least-squares fitting*) untuk memperoleh nilai argumen Bessel $x = kr$ pada setiap frekuensi.
-            8.  **Ekstraksi Kurva Dispersi:**
-                Kecepatan fase Rayleigh dihitung menggunakan rumus $c(f) = \frac{2\pi f r}{x}$. Hasilnya kemudian disaring dalam batasan kecepatan fase minimum dan maksimum, serta dapat dipotong (*frequency cut*) pada rentang frekuensi yang bersih dari noise.
+            1.  **Seismogram Data Input:**
+                Read the raw binary seismic records in SAC or MiniSEED format for the reference station (A) and perimeter stations (B) across all measurement sessions (Session 1, Session 2, ..., Session N).
+            2.  **Temporal Segmentation (Windowing):**
+                Continuous long-duration signals are segmented into shorter time windows (e.g., window length of $2^{13} = 8192$ samples or equivalent to 81.92 seconds at a 100 Hz sampling rate) with a specific overlap. This is crucial to isolate stationary data segments and remove local transient noise (such as vibrations from nearby vehicular traffic).
+            3.  **Spectral Transformation (FFT):**
+                Each time window of time-domain data is transformed into the frequency domain using the Fast Fourier Transform (FFT) algorithm to obtain the amplitude and phase spectra of the signals.
+            4.  **Complex Coherence Calculation:**
+                Complex coherence is calculated at each frequency for every time window of each station pair session ($A-B_1$, $A-B_2$, ..., $A-B_n$).
+            5.  **Quality Control (QC) & Auto-Suggestion of Windows:**
+                *   **RMSE Evaluation:** The application computes the Root Mean Square Error (RMSE) between the coherence curve of each window and the median coherence curve over a control frequency range (default 1 - 50 Hz).
+                *   **Window Suggestions:** Windows with an RMSE below a cutoff threshold (e.g., median + 0.05 standard deviation) are classified as clean (consistent) windows, while windows with high RMSE are classified as outliers (noise) and suggested for exclusion.
+            6.  **Two-Stage Stacking (Averaging):**
+                *   *Stage 1:* The selected windows within each session are averaged independently to obtain the average SPAC coefficient curve for each session ($\rho_1, \rho_2, \dots, \rho_N$).
+                *   *Stage 2:* All average session curves are then averaged together to produce the final stacked SPAC coefficient curve ($\rho_{avg}$). This is essential to ensure balanced spatial weighting from all azimuthal directions of the sensors.
+            7.  **Bessel Function Fitting:**
+                The final stacked SPAC coefficient values $\rho_{avg}(f)$ are fitted to the theoretical Bessel function $J_0(x)$ using the least-squares fitting method to determine the Bessel argument $x = kr$ at each frequency.
+            8.  **Dispersion Curve Extraction:**
+                The Rayleigh wave phase velocity is calculated using the formula $c(f) = \frac{2\pi f r}{x}$. The results are subsequently filtered within specified minimum and maximum phase velocity limits and can be truncated (*frequency cut*) over frequency ranges free of noise.
         """)
         
-    elif topik == "5. Dukungan Artikel & Jurnal Ilmiah":
+    elif topik == "5. Supporting Literature & Scientific Journals":
         st.markdown(r"""
-            #### 5. Dukungan Artikel & Jurnal Ilmiah
+            #### 5. Supporting Literature & Scientific Journals
             
-            Berikut adalah daftar pustaka artikel ilmiah utama yang melandasi metode SPAC sekuensial:
+            Below is the bibliography of key scientific articles supporting the sequential SPAC method:
             
             1.  Aki, K. (1957). Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
             2.  Cho, I. (2020). Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747.
             3.  Hayashi, K., Asten, M. W., Stephenson, W. J., Cornou, C., Hobiger, M., Pilz, M., & Yamanaka, H. (2022). Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627.
             4.  Okada, H. (2003). *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
-            5. Syamsuddin, E., Arif, A.F., Makhrani, Arsyad, A., Effendi, R. (2025). Spatial Autocorrelation Method (SPAC) for Subsurface Shear Wave Velocity Profiling: A Non-invasive Approach for Site Characterization. IOP Conference Series: Earth and Environmental Science, 1525, 012017.
+            5.  Syamsuddin, E., Arif, A.F., Makhrani, Arsyad, A., & Effendi, R. (2025). Spatial Autocorrelation Method (SPAC) for Subsurface Shear Wave Velocity Profiling: A Non-invasive Approach for Site Characterization. *IOP Conference Series: Earth and Environmental Science*, 1525, 012017.
         """)
         
-    elif topik == "6. Ucapan Terima Kasih":
+    elif topik == "6. Acknowledgments":
         st.markdown(r'''
-            #### 6. Ucapan Terima Kasih
+            #### 6. Acknowledgments
             
-            Saya (Ahmad Rianul Qauliah, Geofisika 2020, Universitas Hasanuddin) selaku pengembang web app interaktif ini, mengucapkan apresiasi dan terima kasih kepada Ahmad Fauzy (Geofisika 2018, Universitas Hasanuddin). 
+            I (Ahmad Rianul Qauliah, Geophysics 2020, Hasanuddin University), as the developer of this interactive web application, express my appreciation and gratitude to Ahmad Fauzy (Geophysics 2018, Hasanuddin University).
             
-            Pustaka pemrosesan dasar (*framework*) metode SPAC yang dipublikasikan pada repositori GitHub beliau menjadi salah satu dasar untuk menggerakkan aplikasi web interaktif ini.
+            The foundational processing framework of the SPAC method published on his GitHub repository served as a key basis for powering this interactive web application.
             
         ''')
 
@@ -745,15 +737,15 @@ with tab_teori:
 # TAB 1: INPUT DATA
 # ==========================================
 with tab_input:
-    st.subheader("1. Unggah File Waveform (.sac / .mseed)")
-    st.write("Atur jumlah sesi pengukuran (pasangan stasiun) lalu unggah berkas geofon pusat (A) dan keliling (B) untuk masing-masing sesi:")
+    st.subheader("1. Upload Waveform Files (.sac / .mseed)")
+    st.write("Configure the number of measurement sessions (station pairs), then upload the center geophone (A) and perimeter geophone (B) files for each session:")
 
     # Input for number of sessions
     if "n_sessions_input" not in st.session_state:
         st.session_state.n_sessions_input = 3
 
     n_sessions = st.number_input(
-        "Jumlah Sesi Pengukuran (Jumlah Pasangan Stasiun)",
+        "Number of Measurement Sessions (Number of Station Pairs)",
         min_value=1,
         max_value=20,
         value=st.session_state.n_sessions_input,
@@ -767,48 +759,48 @@ with tab_input:
         for j, col in enumerate(cols):
             idx = i + j + 1
             with col:
-                st.markdown(f"### Sesi {idx} (A - B{idx})")
+                st.markdown(f"### Session {idx} (A - B{idx})")
                 st.markdown("<hr style='border: 0; height: 2px; background: linear-gradient(to right, #FF4B4B, rgba(255, 75, 75, 0.2)); margin-top: 4px; margin-bottom: 16px;' />", unsafe_allow_html=True)
                 
-                file_a = st.file_uploader(f"Upload Pusat A Sesi {idx}", type=["sac", "mseed", "miniseed", "msd", "txt", "asc", "dat", "csv"], key=f"file_a{idx}")
+                file_a = st.file_uploader(f"Upload Center A - Session {idx}", type=["sac", "mseed", "miniseed", "msd", "txt", "asc", "dat", "csv"], key=f"file_a{idx}")
                 sel_a_idx = 0
                 if file_a:
-                    stream_a = load_uploaded_file_as_stream(file_a, fs)
-                    if stream_a:
+                     stream_a = load_uploaded_file_as_stream(file_a, fs)
+                     if stream_a:
                         if len(stream_a) > 1:
                             options_a = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_a)]
                             selected_a = st.selectbox(
-                                f"Pilih Saluran A Sesi {idx}",
+                                f"Select Channel A - Session {idx}",
                                 options=options_a,
                                 key=f"trace_a_sel{idx}"
                             )
                             sel_a_idx = options_a.index(selected_a)
                         
                         with st.expander("Preview Waveform A", expanded=False):
-                            plot_trace_preview(stream_a[sel_a_idx], f"Sinyal A (Sesi {idx})")
+                            plot_trace_preview(stream_a[sel_a_idx], f"Signal A (Session {idx})")
                 
-                file_b = st.file_uploader(f"Upload Keliling B{idx} Sesi {idx}", type=["sac", "mseed", "miniseed", "msd", "txt", "asc", "dat", "csv"], key=f"file_b{idx}")
+                file_b = st.file_uploader(f"Upload Perimeter B{idx} - Session {idx}", type=["sac", "mseed", "miniseed", "msd", "txt", "asc", "dat", "csv"], key=f"file_b{idx}")
                 sel_b_idx = 0
                 if file_b:
-                    stream_b = load_uploaded_file_as_stream(file_b, fs)
-                    if stream_b:
+                     stream_b = load_uploaded_file_as_stream(file_b, fs)
+                     if stream_b:
                         if len(stream_b) > 1:
                             options_b = [f"Trace {k}: {tr.id} ({tr.stats.npts} pts)" for k, tr in enumerate(stream_b)]
                             selected_b = st.selectbox(
-                                f"Pilih Saluran B{idx} Sesi {idx}",
+                                f"Select Channel B{idx} - Session {idx}",
                                 options=options_b,
                                 key=f"trace_b_sel{idx}"
                             )
                             sel_b_idx = options_b.index(selected_b)
                         
                         with st.expander(f"Preview Waveform B{idx}", expanded=False):
-                            plot_trace_preview(stream_b[sel_b_idx], f"Sinyal B{idx} (Sesi {idx})")
+                            plot_trace_preview(stream_b[sel_b_idx], f"Signal B{idx} (Session {idx})")
 
     st.markdown("---")
     
     # Demo Data Option
-    st.write("**Belum punya data lapangan?** Gunakan data demo mikrotremor kami untuk mencoba:")
-    demo_btn = st.button("Gunakan Data Demo")
+    st.write("**Don't have field data yet?** Load our microtremor demo data to try it out:")
+    demo_btn = st.button("Load Demo Data")
     
     if demo_btn:
         # We will copy demo data from local demo_data folder in the repo
@@ -826,12 +818,12 @@ with tab_input:
                     "Pair_2": ["A42.sac", "B42.sac"],
                     "Pair_3": ["A43.sac", "B43.sac"]
                 }
-                st.success("Berhasil memuat Data Demo! Buka tab 'Pemrosesan & Quality Control' untuk mulai memproses.")
+                st.success("Demo Data successfully loaded! Open the 'Processing & Quality Control' tab to start processing.")
                 st.rerun()
             except Exception as ex:
-                st.error(f"Gagal menyalin data demo: {ex}")
+                st.error(f"Failed to copy demo data: {ex}")
         else:
-            st.warning("Folder data demo tidak ditemukan. Silakan unggah file Anda secara manual.")
+            st.warning("Demo data folder not found. Please upload your files manually.")
 
     # Save Uploaded Files
     # Check if user has uploaded any files, if so, only use the uploaded files
@@ -892,24 +884,24 @@ with tab_input:
 
     # Display status
     if len(st.session_state.data_list_by_pair) > 0:
-        st.info("File siap untuk diproses: " + ", ".join([f"{k}: {v[0]} & {v[1]}" for k, v in st.session_state.data_list_by_pair.items()]))
+        st.info("Files ready for processing: " + ", ".join([f"{k}: {v[0]} & {v[1]}" for k, v in st.session_state.data_list_by_pair.items()]))
     else:
-        st.warning("Silakan unggah set data minimal 1 sesi atau gunakan Data Demo.")
+        st.warning("Please upload a dataset containing at least 1 session or load the Demo Data.")
 
 # ==========================================
 # TAB 2: PROSES & QUALITY CONTROL
 # ==========================================
 with tab_processing:
-    st.subheader("2. Pemrosesan Data & Stacking Window (Quality Control)")
+    st.subheader("2. Data Processing & Window Stacking (Quality Control)")
     
     if len(st.session_state.data_list_by_pair) == 0:
-        st.warning("Silakan unggah data Anda atau muat Data Demo di tab Input Data & Sesi sebelum memproses.")
+        st.warning("Please upload your data or load the Demo Data in the Data Input & Sessions tab before processing.")
     else:
         # Run process button
-        btn_run = st.button("Mulai Proses Windowing & Koherensi", type="primary")
+        btn_run = st.button("Start Windowing & Coherence Processing", type="primary")
         
         if btn_run or st.session_state.coherence_calculated:
-            with st.spinner("Sedang memproses sinyal, membagi jendela, dan menghitung koherensi..."):
+            with st.spinner("Processing signals, segmenting windows, and computing coherence..."):
                 try:
                     # Clean processing files first on fresh run
                     if btn_run:
@@ -927,14 +919,14 @@ with tab_processing:
 
                     # Loop through each pair
                     for pair_key, files in st.session_state.data_list_by_pair.items():
-                        st.markdown(f"#### Memproses Sesi {pair_key} ({files[0]} - {files[1]})")
+                        st.markdown(f"#### Processing Session {pair_key} ({files[0]} - {files[1]})")
                         
                         # Read data
                         data_init = readdata.ReadData(main_folder, files, 'SAC')
                         datas = data_init.read_data()
                         
                         # Show windowed data plots side-by-side
-                        st.markdown(f"##### Visualisasi Windowed Data - Sesi {pair_key}")
+                        st.markdown(f"##### Windowed Data Visualization - Session {pair_key}")
                         col_w1, col_w2 = st.columns(2)
                         
                         # Windowing for each file
@@ -969,7 +961,7 @@ with tab_processing:
                             last_spac_coef_obj = spac_coefficient
 
                     st.session_state.coherence_calculated = True
-                    st.success("Pemrosesan Waveform selesai! Silakan lakukan Quality Control di bawah ini.")
+                    st.success("Waveform processing complete! Please perform Quality Control below.")
                     
                     # Store computed values in session state for dynamic UI update
                     st.session_state.windowing_objs = windowing_objs
@@ -977,14 +969,14 @@ with tab_processing:
                     st.session_state.n_windows_found = n_windows_found
 
                 except Exception as ex:
-                    st.error(f"Terjadi kesalahan saat memproses data: {ex}")
+                    st.error(f"An error occurred while processing data: {ex}")
                     st.session_state.coherence_calculated = False
 
         # --- Quality Control Section (Dynamic UI) ---
         if st.session_state.coherence_calculated:
             st.markdown("---")
-            st.markdown("### Quality Control: Seleksi Jendela Koherensi")
-            st.write("Visualisasikan semua jendela koherensi dan gunakan fitur saran otomatis untuk menyaring data yang mirip/konsisten:")
+            st.markdown("### Quality Control: Coherence Window Selection")
+            st.write("Visualize all coherence windows and use the auto-suggestion feature to filter consistent/similar data:")
 
             # Initialize SPAC coefficient class using the first pair's info
             first_pair_key = list(st.session_state.data_list_by_pair.keys())[0]
@@ -998,22 +990,22 @@ with tab_processing:
             list_coh, pairs_win, pairs = spaccoeff.list_coherence_file()
 
             # Group grid plots by pair (Outside the form so they can be viewed immediately without re-rendering the form)
-            st.write("Klik expander di bawah ini untuk melihat kurva koherensi masing-masing jendela:")
+            st.write("Click the expanders below to view the coherence curves for each window:")
             for pair_name, wins in sorted(pairs_win.items()):
-                with st.expander(f"Tampilkan Grid Plot Koherensi - Sesi {pair_name}", expanded=False):
+                with st.expander(f"Show Coherence Grid Plot - Session {pair_name}", expanded=False):
                     plot_coherence_grid_for_pair(pair_name, wins, os.path.join(working_dir, "processing"))
 
-            st.write("Atur parameter filter dan lakukan seleksi jendela untuk stacking di bawah ini:")
+            st.write("Configure filter parameters and select windows for stacking below:")
             
             # Parameter Saran Window Otomatis moved outside st.form so that adjustments trigger real-time updates
-            st.write("**Parameter Saran Window Otomatis**")
+            st.write("**Auto-Suggestion Window Parameters**")
             col_param1, col_param2, col_param3 = st.columns(3)
             with col_param1:
-                std_threshold = st.slider("Tingkat Ketatnya Seleksi (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
+                std_threshold = st.slider("Selection Tightness (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
             with col_param2:
-                f_min_check = st.number_input("Rentang Frekuensi Min (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
+                f_min_check = st.number_input("Min Frequency Range (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
             with col_param3:
-                f_max_check = st.number_input("Rentang Frekuensi Max (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
+                f_max_check = st.number_input("Max Frequency Range (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
 
             with st.form("qc_selection_form"):
                 st.markdown("---")
@@ -1021,7 +1013,7 @@ with tab_processing:
                 
                 # Group selections by pair
                 for pair_name, wins in sorted(pairs_win.items()):
-                    st.markdown(f"#### Analisis & Seleksi: Sesi {pair_name}")
+                    st.markdown(f"#### Analysis & Selection: Session {pair_name}")
                     
                     # 2. Get similarity suggestions
                     suggested_wins, outlier_wins = suggest_similar_windows(
@@ -1032,16 +1024,16 @@ with tab_processing:
                     # 3. Display suggestions
                     col_sug1, col_sug2 = st.columns(2)
                     with col_sug1:
-                        st.success(f"**Saran Window Konsisten**: {suggested_wins}")
+                        st.success(f"**Consistent Window Suggestions**: {suggested_wins}")
                     with col_sug2:
                         if outlier_wins:
-                            st.warning(f"**Window Outlier (Tidak Disarankan)**: {outlier_wins}")
+                            st.warning(f"**Outlier Windows (Not Recommended)**: {outlier_wins}")
                         else:
-                            st.info("**Window Outlier**: Tidak ada outlier terdeteksi.")
+                            st.info("**Outlier Windows**: No outliers detected.")
                     
                     # 4. Multiselect widget for this pair, default to suggested_wins
                     selected_wins = st.multiselect(
-                        f"Pilih nomor window untuk di-stacking ({pair_name}):",
+                        f"Select window numbers for stacking ({pair_name}):",
                         options=sorted([int(w) for w in wins]),
                         default=suggested_wins,
                         key=f"select_{pair_name}"
@@ -1050,7 +1042,7 @@ with tab_processing:
                     st.markdown("---")
                 
                 # Submit button
-                submit_qc = st.form_submit_button("Terapkan Seleksi & Hitung Stacking", type="primary")
+                submit_qc = st.form_submit_button("Apply Selection & Calculate Stacking", type="primary")
 
             # --- Two-Stage Stacking ---
             pair_averages = {}
@@ -1074,7 +1066,7 @@ with tab_processing:
                     pair_averages[pair_name] = np.mean(all_rho, axis=0)
 
             if not pair_averages:
-                st.error("Mohon pilih setidaknya 1 window bersih pada salah satu sesi untuk melakukan Stacking.")
+                st.error("Please select at least 1 clean window in one of the sessions to perform Stacking.")
             else:
                 # Stage 2: Average across all active pairs
                 avspac = np.mean(list(pair_averages.values()), axis=0)
@@ -1094,8 +1086,8 @@ with tab_processing:
                 st.session_state.avspac_stacked = avspac
                 
                 # --- Visualizations ---
-                st.markdown("### Hasil Stacking SPAC Coefficient Akhir")
-                st.write("Kurva di bawah ini adalah hasil rata-rata dua tahap (rata-rata per sesi, lalu dirata-ratakan antar sesi):")
+                st.markdown("### Final Stacked SPAC Coefficient Results")
+                st.write("The curve below represents the two-stage average (average per session, then averaged across sessions):")
                 
                 # Plotly Plot for observed SPAC coefficient
                 fig_spac = go.Figure()
@@ -1103,7 +1095,7 @@ with tab_processing:
                     x=freq,
                     y=avspac,
                     mode='lines+markers',
-                    name='Rata-rata Dua Tahap (Stacked)',
+                    name='Two-Stage Average (Stacked)',
                     line=dict(color='black', width=2),
                     marker=dict(size=4)
                 ))
@@ -1116,17 +1108,17 @@ with tab_processing:
                         x=freq,
                         y=pair_avg,
                         mode='lines',
-                        name=f'Rata-rata Sesi {pair_name}',
+                        name=f'Session {pair_name} Average',
                         line=dict(color=color, width=1.5, dash='dash')
                     ))
                 
                 fig_spac.update_layout(
                      title=dict(
-                         text="Koefisien SPAC Akhir vs Frekuensi",
+                         text="Final SPAC Coefficient vs. Frequency",
                          font=dict(color="black")
                      ),
                      xaxis=dict(
-                         title=dict(text="Frekuensi (Hz)", font=dict(color="black")),
+                         title=dict(text="Frequency (Hz)", font=dict(color="black")),
                          range=[0, 50],
                          showgrid=True,
                          gridcolor="lightgray",
@@ -1136,7 +1128,7 @@ with tab_processing:
                          tickfont=dict(color="black")
                      ),
                      yaxis=dict(
-                         title=dict(text="Koefisien SPAC", font=dict(color="black")),
+                         title=dict(text="SPAC Coefficient", font=dict(color="black")),
                          range=[-1.1, 1.1],
                          showgrid=True,
                          gridcolor="lightgray",
@@ -1154,18 +1146,18 @@ with tab_processing:
                 
                 st.plotly_chart(fig_spac, use_container_width=True)
                 
-                st.success("Koefisien SPAC rata-rata berhasil ditumpuk! Buka tab Kurva Dispersi untuk melihat hasil pencocokan.")
+                st.success("Average SPAC coefficient successfully stacked! Open the Dispersion Curve tab to view the fitting results.")
 
 # ==========================================
 # TAB 3: DISPERSION CURVE FINAL
 # ==========================================
 with tab_output:
-    st.subheader("3. Kurva Dispersi (Pencocokan Fungsi Bessel J0)")
+    st.subheader("3. Dispersion Curve (Bessel J0 Function Fitting)")
     
     if "spaccoeff_obj" not in st.session_state:
-        st.warning("Silakan selesaikan pemrosesan dan Quality Control di tab Pemrosesan & QC Data terlebih dahulu.")
+        st.warning("Please complete the processing and Quality Control in the Processing & QC tab first.")
     else:
-        st.info(f"Menghitung kurva dispersi dengan batas kecepatan fase: {min_pv} m/s hingga {max_pv} m/s.")
+        st.info(f"Calculating dispersion curve with phase velocity bounds: {min_pv} m/s to {max_pv} m/s.")
         
         # Inisialisasi Objek DispersionCurve
         dc = dispersioncurve.DispersionCurve(st.session_state.spaccoeff_obj)
@@ -1175,23 +1167,23 @@ with tab_output:
         freq_dec, avspac_dec = dc.decimator(decimation_factor)
         
         # Calculate dispersion curve
-        with st.spinner("Sedang mengepaskan koefisien SPAC ke Fungsi Bessel (Least-Squares Fitting)..."):
+        with st.spinner("Fitting SPAC coefficient to Bessel function (Least-Squares Fitting)..."):
             try:
                 # returns: pv, f_pv, bessel_fit, x_bessel, fitted_avspac
                 pv, f_pv, bessel_fit, x_bessel, fitted_avspac = dc.calculate_dispcurv(min_pv, max_pv)
                 
                 # --- Frequency Cut Feature ---
-                st.markdown("### Pemotongan Rentang Frekuensi Kurva Dispersi")
-                st.write("Sesuaikan rentang frekuensi yang ingin Anda gunakan untuk analisis lebih lanjut:")
+                st.markdown("### Dispersion Curve Frequency Range Truncation")
+                st.write("Adjust the frequency range to use for further analysis:")
                 with st.form("form_frequency_cut"):
                     col_cut1, col_cut2 = st.columns(2)
                     with col_cut1:
                         f_min_val = float(np.round(np.min(f_pv), 2))
-                        cut_f_min = st.number_input("Frekuensi Minimum Cut (Hz)", min_value=0.0, max_value=100.0, value=max(0.0, f_min_val), step=0.1)
+                        cut_f_min = st.number_input("Minimum Frequency Cut (Hz)", min_value=0.0, max_value=100.0, value=max(0.0, f_min_val), step=0.1)
                     with col_cut2:
                         f_max_val = float(np.round(np.max(f_pv), 2))
-                        cut_f_max = st.number_input("Frekuensi Maximum Cut (Hz)", min_value=0.0, max_value=100.0, value=min(50.0, f_max_val), step=0.1)
-                    st.form_submit_button("Terapkan Pemotongan", type="primary")
+                        cut_f_max = st.number_input("Maximum Frequency Cut (Hz)", min_value=0.0, max_value=100.0, value=min(50.0, f_max_val), step=0.1)
+                    st.form_submit_button("Apply Truncation", type="primary")
                 
                 # Apply filter
                 mask_cut = (f_pv >= cut_f_min) & (f_pv <= cut_f_max)
@@ -1210,7 +1202,7 @@ with tab_output:
                 col_c1, col_c2 = st.columns(2)
                 
                 with col_c1:
-                    st.markdown("#### Fitting Fungsi Bessel J0")
+                    st.markdown("#### Bessel J0 Function Fitting")
                     
                     fig_bessel = go.Figure()
                     
@@ -1221,7 +1213,7 @@ with tab_output:
                         x=x_ideal,
                         y=y_ideal,
                         mode='lines',
-                        name='Fungsi Bessel J0 Ideal',
+                        name='Ideal Bessel J0 Function',
                         line=dict(color='red', width=2)
                     ))
                     
@@ -1230,7 +1222,7 @@ with tab_output:
                         x=x_bessel,
                         y=avspac_dec,
                         mode='markers',
-                        name='Data Lapangan (Luar Rentang)',
+                        name='Field Data (Out of Range)',
                         marker=dict(color='lightgray', size=5),
                         showlegend=True
                     ))
@@ -1239,13 +1231,13 @@ with tab_output:
                         x=x_bessel_cut,
                         y=avspac_dec_cut,
                         mode='markers',
-                        name='Data Lapangan (Aktif)',
+                        name='Field Data (Active)',
                         marker=dict(color='black', size=7)
                     ))
                     
                     fig_bessel.update_layout(
                         title=dict(
-                            text="Pencocokan Data Lapangan ke Fungsi Bessel J0",
+                            text="Field Data Fitting to Bessel J0 Function",
                             font=dict(color="black")
                         ),
                         xaxis=dict(
@@ -1259,7 +1251,7 @@ with tab_output:
                             tickfont=dict(color="black")
                         ),
                         yaxis=dict(
-                            title=dict(text="Koefisien SPAC", font=dict(color="black")),
+                            title=dict(text="SPAC Coefficient", font=dict(color="black")),
                             range=[-1.1, 1.1],
                             showgrid=True,
                             gridcolor="lightgray",
@@ -1278,7 +1270,7 @@ with tab_output:
                     st.plotly_chart(fig_bessel, use_container_width=True)
                     
                 with col_c2:
-                    st.markdown("#### Kurva Dispersi Rayleigh")
+                    st.markdown("#### Rayleigh Dispersion Curve")
                     
                     # Tentukan batas zoom otomatis secara dinamis
                     if len(f_pv_cut) > 0:
@@ -1298,7 +1290,7 @@ with tab_output:
                         x=f_pv,
                         y=pv,
                         mode='lines+markers',
-                        name='Semua Frekuensi',
+                        name='All Frequencies',
                         line=dict(color='lightgray', width=1),
                         marker=dict(color='lightgray', size=4)
                     ))
@@ -1308,18 +1300,18 @@ with tab_output:
                         x=f_pv_cut,
                         y=pv_cut,
                         mode='lines+markers',
-                        name='Rentang Terpotong (Aktif)',
+                        name='Truncated Range (Active)',
                         line=dict(color='blue', width=2.5),
                         marker=dict(color='darkblue', size=6)
                     ))
                     
                     fig_disp.update_layout(
                          title=dict(
-                             text="Kurva Dispersi Rayleigh (Kecepatan Fase vs Frekuensi)",
+                             text="Rayleigh Dispersion Curve (Phase Velocity vs. Frequency)",
                              font=dict(color="black")
                          ),
                          xaxis=dict(
-                             title=dict(text="Frekuensi (Hz)", font=dict(color="black")),
+                             title=dict(text="Frequency (Hz)", font=dict(color="black")),
                              range=x_range,
                              showgrid=True,
                              gridcolor="lightgray",
@@ -1329,7 +1321,7 @@ with tab_output:
                              tickfont=dict(color="black")
                          ),
                          yaxis=dict(
-                             title=dict(text="Kecepatan Fase (m/s)", font=dict(color="black")),
+                             title=dict(text="Phase Velocity (m/s)", font=dict(color="black")),
                              range=y_range,
                              showgrid=True,
                              gridcolor="lightgray",
@@ -1349,7 +1341,7 @@ with tab_output:
                     
                 # --- Export and Download Results ---
                 st.markdown("---")
-                st.markdown("### Ekspor Hasil Analisis")
+                st.markdown("### Export Analysis Results")
                 
                 # Full Dataframe
                 export_df_full = pd.DataFrame({
@@ -1370,14 +1362,14 @@ with tab_output:
                 })
                 
                 # Show preview of cut data
-                st.write("Pratinjau Data Kurva Dispersi Terpotong (Aktif):")
+                st.write("Preview of Truncated Dispersion Curve Data (Active):")
                 st.dataframe(export_df_cut, use_container_width=True)
                 
                 col_btn1, col_btn2 = st.columns(2)
                 with col_btn1:
                     csv_full = export_df_full.to_csv(index=False)
                     st.download_button(
-                        label="Unduh Kurva Dispersi Penuh (CSV)",
+                        label="Download Full Dispersion Curve (CSV)",
                         data=csv_full,
                         file_name=f"dispersion_curve_FULL_radius_{radius}m.csv",
                         mime="text/csv",
@@ -1386,7 +1378,7 @@ with tab_output:
                 with col_btn2:
                     csv_cut = export_df_cut.to_csv(index=False)
                     st.download_button(
-                        label="Unduh Kurva Dispersi Terpotong (CSV)",
+                        label="Download Truncated Dispersion Curve (CSV)",
                         data=csv_cut,
                         file_name=f"dispersion_curve_CUT_{cut_f_min:.1f}to{cut_f_max:.1f}Hz.csv",
                         mime="text/csv",
@@ -1396,7 +1388,7 @@ with tab_output:
 
                 
             except Exception as ex_fit:
-                st.error(f"Gagal melakukan least-squares fitting: {ex_fit}")
+                st.error(f"Failed to perform least-squares fitting: {ex_fit}")
 
 # ==========================================
 # TAB 5: INVERSI VS 1D
