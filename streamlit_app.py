@@ -997,15 +997,17 @@ with tab_processing:
 
             st.write("Configure filter parameters and select windows for stacking below:")
             
-            # Parameter Saran Window Otomatis moved outside st.form so that adjustments trigger real-time updates
-            st.write("**Auto-Suggestion Window Parameters**")
-            col_param1, col_param2, col_param3 = st.columns(3)
-            with col_param1:
-                std_threshold = st.slider("Selection Tightness (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
-            with col_param2:
-                f_min_check = st.number_input("Min Frequency Range (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
-            with col_param3:
-                f_max_check = st.number_input("Max Frequency Range (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
+            # Auto-Suggestion Window Parameters wrapped in their own form to process all adjustments at once
+            with st.form("auto_suggestion_form"):
+                st.write("**Auto-Suggestion Window Parameters**")
+                col_param1, col_param2, col_param3 = st.columns(3)
+                with col_param1:
+                    std_threshold = st.slider("Selection Tightness (std multiplier)", min_value=0.01, max_value=0.50, value=0.05, step=0.01)
+                with col_param2:
+                    f_min_check = st.number_input("Min Frequency Range (Hz)", min_value=0.0, max_value=50.0, value=1.0, step=0.5)
+                with col_param3:
+                    f_max_check = st.number_input("Max Frequency Range (Hz)", min_value=1.0, max_value=50.0, value=50.0, step=0.5)
+                st.form_submit_button("Apply Auto-Suggestion Parameters", type="secondary")
 
             with st.form("qc_selection_form"):
                 st.markdown("---")
