@@ -674,13 +674,13 @@ with tab_teori:
 </div>""", unsafe_allow_html=True)
             
         st.markdown(r"""
-            ##### B. Parameter Akuisisi Data Lapangan
+            ##### B. Field Data Acquisition Parameters
             *   **Array Radius ($r$):** $r$ (radius of the perimeter geophone stations from the center).
-            *   **Recording Duration:** minimum of 20 minutes for each station pair (total duration scales with the number of sessions).
-            *   **Sampling Rate:** 100 Hz (retrieved directly from the metadata/header of the uploaded .sac/.mseed seismic records).
+            *   **Recording Duration:** e.g., minimum of 20 minutes for each station pair (total duration scales with the number of sessions).
+            *   **Sampling Rate:** e.g., 100 Hz (retrieved directly from the metadata/header of the uploaded .sac/.mseed seismic records).
             *   **Geophone Sensor:** Geophone (vertical component).
             
-            ##### C. Asumsi Kunci
+            ##### C. Key Assumptions
             This method relies heavily on the assumption that the ambient noise wavefield is stationary (its statistical properties remain stable and unchanged) throughout the total duration of all recording sessions. The azimuthal average is simulated numerically during data processing by averaging the cross-coherence results from all station pairs recorded separately.
         """)
         
