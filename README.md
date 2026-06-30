@@ -29,7 +29,7 @@ where $r$ is the array radius, $f$ is frequency, and $c(f)$ is the Rayleigh wave
 1. Open your terminal or **Anaconda Prompt**.
 2. Navigate to the project directory:
    ```bash
-   cd "C:\Users\RIANO\.gemini\antigravity\scratch\spac-microtremor"
+   cd "path/to/spac-microtremor"
    ```
 3. Install the required dependencies:
    ```bash
@@ -74,7 +74,7 @@ di mana $r$ adalah radius lingkaran array, $f$ adalah frekuensi, dan $c(f)$ adal
 1. Buka terminal atau **Anaconda Prompt**.
 2. Arahkan ke direktori folder proyek:
    ```bash
-   cd "C:\Users\RIANO\.gemini\antigravity\scratch\spac-microtremor"
+   cd "jalur/ke/spac-microtremor"
    ```
 3. Instal pustaka dependensi yang diperlukan:
    ```bash
