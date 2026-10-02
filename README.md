@@ -10,7 +10,7 @@ An advanced, cloud-native computational platform engineered for processing passi
 ## Direct Web Access
 The web application is deployed online and operates entirely within a cloud environment without requiring local installation, runtime dependencies, or command-line execution:
 
-👉 **[https://spac-arq.streamlit.app/](https://spac-arq.streamlit.app/)**
+ **[https://spac-arq.streamlit.app/](https://spac-arq.streamlit.app/)**
 
 ---
 
