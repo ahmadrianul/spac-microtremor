@@ -1,103 +1,83 @@
-# SPAC Microtremor Analysis Web App
-##Access here: https://spac-arq.streamlit.app/ ##
+# SPAC Microtremor Analysis Web Platform
 
-An interactive Streamlit-based web application for ambient noise/microtremor analysis using the Spatial Autocorrelation (SPAC) method to extract phase velocity dispersion curves.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://spac-arq.streamlit.app/)
+[![Web Application](https://img.shields.io/badge/Web%20App-Live%20Access-brightgreen?style=flat&logo=streamlit)](https://spac-arq.streamlit.app/)
 
-*Aplikasi web interaktif berbasis Streamlit untuk analisis ambient noise/mikrotremor menggunakan metode Spatial Autocorrelation (SPAC) untuk mengekstrak kurva dispersi kecepatan fase.*
-
----
-
-## Language / Bahasa
-
-* [English](#english)
-* [Bahasa Indonesia](#bahasa-indonesia)
+An advanced, cloud-native computational platform engineered for processing passive ambient seismic noise (microtremor array measurements). The application automates the execution of the **Spatial Autocorrelation (SPAC)** method to extract high-fidelity Rayleigh wave phase velocity dispersion curves for non-invasive near-surface characterization and 1D shear-wave velocity ($V_s$) profiling.
 
 ---
 
-## English
+## Direct Web Access
+The web application is deployed online and operates entirely within a cloud environment without requiring local installation, runtime dependencies, or command-line execution:
 
-### 1. Web App Explanation
-This web application provides a user-friendly and interactive interface to process passive microtremor data. It implements the sequential two-station (or multi-session circular) Spatial Autocorrelation (SPAC) method. Users can dynamically configure the number of sessions, upload raw waveform files (supporting SAC, MiniSEED, and ASCII formats), perform time segmentation (windowing), calculate complex coherence, filter out outliers using auto-suggestion parameters, stack coherence curves, fit them to the zero-order Bessel function ($J_0$), and extract the final Rayleigh wave phase velocity dispersion curve. The results can be visualized interactively and downloaded as CSV files.
-
-### 2. Brief Explanation of SPAC
-The Spatial Autocorrelation (SPAC) method, originally formulated by Aki (1957), is a non-invasive passive geophysical technique. It utilizes ambient seismic noise (such as ocean waves, wind, traffic, and industrial vibrations) dominated by surface waves (mainly Rayleigh waves) to characterize subsurface shear wave velocity ($V_s$) structures. By calculating the spatial coherence of microtremors recorded at a center station and several perimeter stations, the average azimuthal correlation is matched to the zero-order Bessel function of the first kind:
-$$\rho(f, r) = J_0\left(\frac{2\pi f r}{c(f)}\right)$$
-where $r$ is the array radius, $f$ is frequency, and $c(f)$ is the Rayleigh wave phase velocity. Solving this equation yields the dispersion curve ($c(f)$ vs. $f$), which is essential for characterizing soil stiffness and shear wave profiles.
-
-### 3. How to Access and Run the App
-
-#### Local Execution (Anaconda / Command Prompt)
-1. Open your terminal or **Anaconda Prompt**.
-2. Navigate to the project directory:
-   ```bash
-   cd "path/to/spac-microtremor"
-   ```
-3. Install the required dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Run the Streamlit web application:
-   ```bash
-   streamlit run streamlit_app.py
-   ```
-5. Your default web browser will automatically open showing the app at `http://localhost:8501`.
-
-#### Cloud Deployment (Streamlit Cloud)
-To deploy the application online:
-1. Push the project repository to your GitHub account.
-2. Log in to [Streamlit Community Cloud](https://share.streamlit.io/).
-3. Click "New app", select your repository, set the branch to `main`, and enter `streamlit_app.py` as the main file path.
-4. Click "Deploy!".
-
-### 4. Supporting Scientific Literature
-The processing library and theory implemented in this application are supported by the following literature:
-1. **Aki, K. (1957)**. Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
-2. **Okada, H. (2003)**. *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
-3. **Cho, I. (2020)**. Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747.
-4. **Hayashi, K. et al. (2022)**. Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627.
-5. **Syamsuddin, E. et al. (2025)**. Spatial Autocorrelation Method (SPAC) for Subsurface Shear Wave Velocity Profiling: A Non-invasive Approach for Site Characterization. *IOP Conference Series: Earth and Environmental Science*, 1525, 012017.
+👉 **[https://spac-arq.streamlit.app/](https://spac-arq.streamlit.app/)**
 
 ---
 
-## Bahasa Indonesia
+## Theoretical Framework: Spatial Autocorrelation (SPAC)
 
-### 1. Penjelasan Web App
-Aplikasi web ini menyediakan antarmuka interaktif yang mudah digunakan untuk memproses data mikrotremor pasif. Aplikasi ini mengimplementasikan metode Spatial Autocorrelation (SPAC) sekuensial dua stasiun (atau lingkaran multi-sesi). Pengguna dapat menentukan jumlah sesi secara dinamis, mengunggah file waveform mentah (mendukung format SAC, MiniSEED, dan ASCII), melakukan segmentasi waktu (windowing), menghitung koherensi kompleks, menyaring outlier menggunakan parameter saran otomatis, melakukan stacking kurva koherensi, mencocokkannya ke fungsi Bessel orde nol ($J_0$), dan mengekstrak kurva dispersi kecepatan fase gelombang Rayleigh. Hasil analisis dapat divisualisasikan secara interaktif dan diunduh dalam format CSV.
+### 1. Fundamental Principles
+The Spatial Autocorrelation (SPAC) method, originally formulated by **Keiiti Aki (1957)** and expanded for practical geotechnical and geophysical surveys by **H. Okada (2003)**, is a passive surface-wave technique. Unlike active seismic methods (such as MASW or seismic refraction) that rely on impulsive artificial sources (e.g., sledgehammers or explosive charges), the SPAC method harnesses ambient vibrations—stochastic wavefields generated by natural phenomena (ocean wave action, wind-tree coupling, atmospheric pressure shifts) and anthropogenic sources (traffic flow, urban infrastructure, rotating machinery).
 
-### 2. Penjelasan Singkat Metode SPAC
-Metode Spatial Autocorrelation (SPAC), yang pertama kali diformulasikan oleh Aki (1957), adalah teknik geofisika pasif non-invasif. Metode ini memanfaatkan kebisingan seismik ambient (seperti gelombang laut, angin, lalu lintas, dan getaran industri) yang didominasi oleh gelombang permukaan (terutama gelombang Rayleigh) untuk mencirikan struktur kecepatan gelombang geser ($V_s$) bawah permukaan. Dengan menghitung koherensi spasial mikrotremor yang direkam di stasiun pusat dan beberapa stasiun keliling, rata-rata korelasi azimuthal dicocokkan dengan fungsi Bessel jenis pertama orde nol:
-$$\rho(f, r) = J_0\left(\frac{2\pi f r}{c(f)}\right)$$
-di mana $r$ adalah radius lingkaran array, $f$ adalah frekuensi, dan $c(f)$ adalah kecepatan fase gelombang Rayleigh. Pemecahan persamaan ini menghasilkan kurva dispersi ($c(f)$ vs. $f$), yang penting untuk karakterisasi kekakuan tanah dan profil Vs.
+In urban and semi-urban settings, vertical-component ambient seismic noise is fundamentally dominated by fundamental-mode **Rayleigh waves**. The core premise of the SPAC method is that a microtremor wavefield, when observed over a sufficiently long recording duration, can be treated as a spatially and temporally stationary stochastic process originating from a random distribution of uncorrelated sources surrounding the recording station array.
 
-### 3. Cara Mengakses dan Menjalankan Aplikasi
+### 2. Mathematical Formulation
+Consider two seismic stations located on the surface separated by a distance vector $\mathbf{r} = (r, \theta)$. The cross-correlation between the vertical signal recorded at the array center $u(0, t)$ and at a perimeter station $u(\mathbf{r}, t)$ in the frequency domain is represented by their cross-spectral density $S_{0r}(f)$.
 
-#### Menjalankan Secara Lokal (Anaconda / Command Prompt)
-1. Buka terminal atau **Anaconda Prompt**.
-2. Arahkan ke direktori folder proyek:
-   ```bash
-   cd "jalur/ke/spac-microtremor"
-   ```
-3. Instal pustaka dependensi yang diperlukan:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Jalankan aplikasi Streamlit:
-   ```bash
-   streamlit run streamlit_app.py
-   ```
-5. Browser web Anda secara otomatis akan terbuka menampilkan aplikasi pada alamat `http://localhost:8501`.
+When microtremor sources are statistically isotropic (uniformly distributed over all azimuths) or when azimuthal averaging is applied over a circular array of radius $r$, the azimuthal average of the normalized spatial autocorrelation coefficient $\rho(f, r)$ collapses into a zero-order Bessel function of the first kind:
 
-#### Penerbitan Cloud (Streamlit Cloud)
-Untuk menayangkan aplikasi secara online agar dapat diakses publik:
-1. Unggah folder proyek lokal ini ke repositori akun GitHub Anda.
-2. Masuk ke dashboard [Streamlit Community Cloud](https://share.streamlit.io/).
-3. Klik "New app", pilih repositori Anda, pilih branch ke `main`, dan isi `streamlit_app.py` pada jalur file utama (main file path).
-4. Klik "Deploy!".
+$$\rho(f, r) = \frac{1}{2\pi} \int_{0}^{2\pi} \frac{\text{Re}\left[S(r, \theta, f)\right]}{\sqrt{S_0(f) \cdot S_r(f)}} \, d\theta = J_0\left(\frac{2\pi f r}{c(f)}\right) = J_0(k(f) \cdot r)$$
 
-### 4. Literatur Ilmiah Pendukung
-Pustaka pemrosesan dan teori yang diimplementasikan dalam aplikasi ini didukung oleh artikel-artikel ilmiah berikut:
-1. **Aki, K. (1957)**. Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
-2. **Okada, H. (2003)**. *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists.
-3. **Cho, I. (2020)**. Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747.
-4. **Hayashi, K. et al. (2022)**. Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627.
-5. **Syamsuddin, E. et al. (2025)**. Spatial Autocorrelation Method (SPAC) for Subsurface Shear Wave Velocity Profiling: A Non-invasive Approach for Site Characterization. *IOP Conference Series: Earth and Environmental Science*, 1525, 012017.
+Where:
+* **$\rho(f, r)$**: The real-valued spatial autocorrelation coefficient at frequency $f$ and inter-station spacing $r$.
+* **$S(r, \theta, f)$**: The complex cross-spectrum between the central station and a station positioned at distance $r$ and azimuth $\theta$.
+* **$S_0(f)$ & $S_r(f)$**: The auto-power spectral densities of the central and perimeter sensors, respectively.
+* **$J_0$**: The zero-order Bessel function of the first kind.
+* **$c(f)$**: The phase velocity of the Rayleigh wave at frequency $f$.
+* **$k(f) = \frac{2\pi f}{c(f)}$**: The angular wavenumber of the propagating wave mode.
+
+### 3. Dispersion Curve Inversion
+By computing $\rho(f, r)$ across discrete frequency intervals and fitting the empirical curve to the theoretical Bessel function $J_0(k r)$, the phase velocity $c(f)$ can be determined either via:
+1. **Direct Zero-Crossing Analysis:** Matching the roots of $\rho(f, r)$ to the known zeros of $J_0(x)$ ($x_1 \approx 2.4048, x_2 \approx 5.5201, \dots$).
+2. **Nonlinear Optimization / Curve Fitting:** Least-squares regression minimizing the misfit between theoretical $J_0$ curves and recorded autocorrelation ratios over a continuous frequency band.
+
+The resulting phase velocity dispersion curve ($c(f)$ versus frequency $f$) reflects the dispersive nature of Rayleigh waves in vertically heterogeneous media: high-frequency components are confined to shallow strata, while lower-frequency (longer-wavelength) components penetrate deeper geological units. Inverting this dispersion curve yields the 1D vertical profile of shear-wave velocity ($V_s$), which is vital for engineering site classification ($V_{s,30}$), seismic hazard assessment, and liquefaction vulnerability evaluation.
+
+---
+
+## Web Platform Architecture & Capabilities
+
+This web application streamlines the multi-step SPAC analysis pipeline into a guided, interactive graphical interface designed for research institutions, geotechnical engineers, and exploration geophysicists.
+
+### Core Processing Workflow:
+* **Heterogeneous Seismic Data Ingestion:**
+  * Direct file uploading and automated parsing of standard formats: **MiniSEED**, **SAC (Seismic Analysis Code)**, and **ASCII / CSV** tabular records.
+  * Interactive channel identification, sampling rate verification, and signal component validation.
+* **Dynamic Array & Multi-Session Configuration:**
+  * Adaptable configuration supporting circular arrays, triangular arrays, and sequential two-station configurations with variable inter-station radii ($r$).
+  * Dynamic multi-session pairing enabling center-to-perimeter cross-correlation across progressive deployment cycles.
+* **Signal Conditioning & Windowing:**
+  * Automated time segmentation into overlapping or non-overlapping time windows (Hanning/Hamming tapering) to mitigate transient spectral leakage and spurious localized disturbances.
+  * Instrumental trend elimination, baseline correction, and customizable bandpass filtering.
+* **Spatial Autocorrelation & Statistical Quality Control:**
+  * Complex cross-spectrum computation using Fast Fourier Transforms (FFT).
+  * Automated outlier detection with user-tunable thresholds to isolate corrupted time windows or anomalous industrial bursts.
+  * Coherence curve stacking across individual time slices to maximize signal-to-noise ratio (SNR).
+* **Bessel Fitting & Velocity Extraction:**
+  * Robust numerical matching of stacked spatial autocorrelation curves with the $J_0$ function.
+  * Dynamic frequency band restriction to avoid spatial aliasing (where array dimensions exceed half-wavelength constraints).
+* **Interactive Visualization & Data Export:**
+  * High-resolution, interactive Plotly visualizations displaying raw waveforms, multi-window coherence curves, Bessel fitting diagnostics, and final dispersion spectra.
+  * Direct tabular download of extracted dispersion curves in standard **CSV** format, pre-formatted for direct ingestion into 1D inversion engines (e.g., Dinver/Geopsy, CPS330, or custom stochastic Monte Carlo codes).
+
+---
+
+## Key Literature & Scientific References
+
+The underlying algorithms and signal processing procedures adhere to the methodologies established in the following publications:
+
+1. **Aki, K. (1957).** Space and time spectra of stationary stochastic waves, with special reference to microtremors. *Bulletin of the Earthquake Research Institute*, 35, 415–456.
+2. **Okada, H. (2003).** *The Microtremor Survey Method* (K. Suto, Trans.). Society of Exploration Geophysicists (SEG), Geophysical Monograph Series No. 12.
+3. **Cho, I. (2020).** Two-sensor microtremor SPAC method: potential utility of imaginary spectrum components. *Geophysical Journal International*, 220(3), 1735–1747.
+4. **Hayashi, K., Suzuki, H., & Hikima, K. (2022).** Microtremor array method using spatial autocorrelation analysis of Rayleigh-wave data. *Journal of Seismology*, 26(4), 601–627.
+5. **Syamsuddin, E., et al. (2025).** Spatial Autocorrelation Method (SPAC) for Subsurface Shear Wave Velocity Profiling: A Non-invasive Approach for Site Characterization. *IOP Conference Series: Earth and Environmental Science*, 1525, 012017.
